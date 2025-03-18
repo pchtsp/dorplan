@@ -1,0 +1,28 @@
+[project]
+name = "dorplan"
+version = "0.1"
+description = "Desktop OR planner"
+requires-python = ">=3.10"
+dependencies = ["cornflow-client", "orloge", "PySide6", "networkx", "quarto", "quarto-cli", "papermill", "matplotlib"]
+authors= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
+maintainers= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
+readme='README.md'
+keywords= ["Mathematical", "Optimization", "solver", "GUI"]
+classifiers= [
+    "Programming Language :: Python",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+urls= {source= "https://github.com/pchtsp/orloge", download="https://github.com/pchtsp/orloge/archive/master.zip"}
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# This is a workaround for https://github.com/astral-sh/uv/issues/9513
+license-files = []
+
+[dependency-groups]
+dev = ["black"]
