@@ -21,8 +21,18 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
+packages = [
+    "dorplan", "dorplan.tests", "dorplan.tests.data.graph_coloring",
+    "dorplan.tests.data.graph_coloring.data",
+    "dorplan.tests.data.graph_coloring.schemas",
+    "dorplan.tests.data.graph_coloring.report"]
 # This is a workaround for https://github.com/astral-sh/uv/issues/9513
 license-files = []
+
+[tool.setuptools.package-data]
+"dorplan.tests.data.graph_coloring.data"= ["*"]
+"dorplan.tests.data.graph_coloring.report"= ["*.qmd"]
+"dorplan.tests.data.graph_coloring.schemas"= ["*.json"]
 
 [dependency-groups]
 dev = ["black"]
