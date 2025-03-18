@@ -491,6 +491,4 @@ if __name__ == "__main__":
     # https://www.learnpyqt.com/blog/pyqt5-vs-pyside2/
     # pyside6-uic ihtc2024/ui/gui/gui.ui -o ihtc2024/ui/gui/gui.py
 
-    from ihtc2024 import IntegratedHealtcareTimetable as TheApp
-
-    DorPlan(TheApp, {})
+    pass
