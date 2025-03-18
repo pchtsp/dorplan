@@ -390,6 +390,10 @@ class DorPlan(object):
         dirname = os.path.dirname(self.excel_path)
         if os.path.exists(dirname):
             html_file_path = os.path.join(dirname, "report.html")
+            try:
+                os.remove(html_file_path)
+            except FileNotFoundError:
+                pass
             os.rename(rep_path, html_file_path)
         else:
             self.show_message(
@@ -397,7 +401,7 @@ class DorPlan(object):
                 "No report was found. Please generate a report first.",
             )
             return 0
-        with open(html_file_path, "r") as file:
+        with open(html_file_path, "r", encoding="utf8") as file:
             content = file.read()
             text_browser.setText(content)
         text_browser.show()
