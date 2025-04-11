@@ -24,19 +24,12 @@ class OptimWorker(BaseWorker):
             self.status.emit("Task started!")
             self.started.emit()
             my_solver = self.my_app.get_solver(self.solver_name)
-            if self.solver_name in ["cpsat2step", "cpsat"]:
-                try:
-                    self.my_callback_obj = my_solver.getStopOnUser_callback()
-                    self.options["stop_condition"] = self.my_callback_obj
-                except:
-                    pass
-            else:
-                try:
-                    self.my_callback_obj = my_solver.getStopOnUser_callback()
-                    self.options["stop_condition"] = self.my_callback_obj
-                except:
-                    pass
-
+            # we configure the callback object and tie it to the solver and the worker
+            try:
+                self.my_callback_obj = my_solver.getStopOnUser_callback()
+                self.options["stop_condition"] = self.my_callback_obj
+            except:
+                pass
             experiment = my_solver(self._instance, self.solution)
             status = experiment.solve(self.options)
             self.solution = experiment.solution

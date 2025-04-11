@@ -305,10 +305,7 @@ class DorPlan(object):
         self.ui.generateSolution.setEnabled(True)
         self.ui.stopExecution.setEnabled(False)
         self.ui.tabWidget.setCurrentIndex(1)
-        self.show_message(
-            "Info",
-            "A solution was found and was loaded",
-        )
+        self.show_message("Info", "A solution was found.", icon="information")
         return 1
 
     def export_solution_gen(self, output_path):
@@ -349,7 +346,16 @@ class DorPlan(object):
                 "No solution can be exported because there is no loaded solution.",
             )
             return 0
+        try:
+            import quarto
 
+            quarto.find_quarto()
+        except:
+            self.show_message(
+                "Error",
+                "Quarto is not installed/available. Please install support for reports, i.e., pip install dorplan[reports]",
+            )
+            return 0
         self.ui.solution_report.clear()
         dirname = os.path.dirname(self.excel_path)
         my_log_file = os.path.join(dirname, "log_report.txt")
