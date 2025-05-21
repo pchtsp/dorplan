@@ -21,11 +21,11 @@ jobs:
         python-version: 3.12
     - name: Build a distribution
       run: uv build
-    - name: Publish distribution 📦 to Test PyPI
-      if: startsWith(github.event.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository_url: https://test.pypi.org/legacy/
+#    - name: Publish distribution 📦 to Test PyPI
+#      if: startsWith(github.event.ref, 'refs/tags')
+#      uses: pypa/gh-action-pypi-publish@release/v1
+#      with:
+#        repository-url: https://test.pypi.org/legacy/
     - name: Publish distribution 📦 to PyPI
       if: startsWith(github.event.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
