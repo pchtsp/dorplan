@@ -29,8 +29,8 @@ class DorPlan(object):
     excel_path: str
     Instance: Type[InstanceCore]
     Solution: Type[SolutionCore]
-    instance: InstanceCore
-    solution: SolutionCore
+    instance: InstanceCore | None
+    solution: SolutionCore | None
 
     def __init__(
         self,
@@ -105,7 +105,7 @@ class DorPlan(object):
         # self.options["log_handler"] = text_browser_handler
 
         MainWindow.show()
-        sys.exit(self.app.exec())
+        self.app.exec()
 
     def load_test(self):
 
@@ -269,8 +269,7 @@ class DorPlan(object):
             solution_json_str,
             copy.deepcopy(options),
         )
-        self.opt_worker.setObjectName("test thread")
-        self.opt_worker.setObjectName("test thread")
+        # self.opt_worker.setObjectName("test thread")
 
         self.my_log_tailer = LogTailer(
             options["logPath"], self.ui.solution_log, interval=100
