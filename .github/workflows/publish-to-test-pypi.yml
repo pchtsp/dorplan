@@ -1,0 +1,28 @@
+name: Publish Python 🐍 distributions 📦 to PyPI
+
+on: push
+
+jobs:
+  build-n-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+    - name: Install uv and set the python version
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: 3.12
+    - name: Build a distribution
+      run: uv build
+    - name: Publish distribution 📦 to Test PyPI
+      if: startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        repository_url: https://test.pypi.org/
+    - name: Publish distribution 📦 to PyPI
+      if: startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master

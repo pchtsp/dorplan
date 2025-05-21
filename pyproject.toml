@@ -7,7 +7,7 @@ dependencies = ["cornflow-client", "orloge", "PySide6"]
 authors= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
 maintainers= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
 readme='README.md'
-keywords= ["Mathematical", "Optimization", "solver", "GUI"]
+keywords= ["Mathematical", "Optimization", "solver", "GUI", "desktop", "cross-platform"]
 classifiers= [
     "Programming Language :: Python",
     "Topic :: Software Development",
