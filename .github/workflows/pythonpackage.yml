@@ -22,5 +22,10 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: install ubuntu dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update -qq
+        sudo apt install -qq freeglut3-dev
     - name: Test
       run: uv run --group dev python -m unittest discover -s dorplan.tests
