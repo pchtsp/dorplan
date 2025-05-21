@@ -42,4 +42,5 @@ license-files = []
 "dorplan.tests.data.graph_coloring.schemas"= ["*.json"]
 
 [dependency-groups]
-dev = ["black"]
+# networkx, ortools, quarto are needed for testing with graphcoloring
+dev = ["black", "networkx", "ortools", "quarto"]
