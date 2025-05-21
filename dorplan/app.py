@@ -8,12 +8,12 @@ from cornflow_client.constants import (
 )
 
 import os
-import gui
 
 from typing import Type
-from optimworker import OptimWorker
-from repWorker import RepWorker
-from log_tailer import LogTailer
+from .optimworker import OptimWorker
+from .repWorker import RepWorker
+from .log_tailer import LogTailer
+from .gui import Ui_MainWindow
 
 import copy
 
@@ -25,14 +25,19 @@ class DorPlan(object):
     my_app: ApplicationCore
     options: dict
     app: QtWidgets.QApplication
-    ui: gui.Ui_MainWindow
+    ui: Ui_MainWindow
     excel_path: str
     Instance: Type[InstanceCore]
     Solution: Type[SolutionCore]
     instance: InstanceCore
     solution: SolutionCore
 
-    def __init__(self, optim_app: Type[ApplicationCore], options: dict):
+    def __init__(
+        self,
+        optim_app: Type[ApplicationCore],
+        options: dict,
+        ui: Type[Ui_MainWindow] | None = None,
+    ):
         # handle solving in thread
         # self.thread = None
         self.opt_worker = None
@@ -56,8 +61,9 @@ class DorPlan(object):
             self.examplesDir = scriptDir + "/../../../../results/"
         icon_path = os.path.join(scriptDir, "plane.ico")
         MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
-
-        self.ui = gui.Ui_MainWindow()
+        if ui is None:
+            ui = Ui_MainWindow
+        self.ui = ui()
         self.ui.setupUi(MainWindow)
         self.excel_path = "./"
 
@@ -112,7 +118,7 @@ class DorPlan(object):
 
     def update_options(self):
         try:
-            self.options["timeLimit"] = float(self.ui.max_time.text())
+            self.options["timeLimit"] = int(self.ui.max_time.text())
             self.options["debug"] = self.ui.log_level.currentIndex() == 1
             self.options["solver"] = self.ui.solver.currentText()
         except:
@@ -278,33 +284,27 @@ class DorPlan(object):
         self.ui.generateSolution.setEnabled(False)
         self.ui.stopExecution.setEnabled(True)
 
-        # new Worker:
         self.opt_worker.start()
         self.update_ui()
-
-        # old Worker:
-        # self.thread = QtCore.QThread()
-        # self.worker.moveToThread(self.thread)
-        # self.worker.finished.connect(self.worker.deleteLater)
-        # self.thread.started.connect(self.worker.run)
-        # self.worker.finished.connect(self.thread.quit)
-        # self.thread.finished.connect(self.thread.deleteLater)
-        # self.thread.start()
 
         return 1
 
     @QtCore.Slot(bool, int, str)
     def get_solution(self, success, sol_status, soldata):
+        self.ui.generateSolution.setEnabled(True)
+        self.ui.stopExecution.setEnabled(False)
         if not success:
+            self.show_message(
+                "Info", "An unexpected error occurred.", icon="information"
+            )
             return 0
         if sol_status != SOLUTION_STATUS_FEASIBLE or not soldata:
+            self.show_message("Info", "No solution was found.", icon="information")
             return 0
         self.solution = self.Solution.from_dict(soldata)
         self.update_ui()
         # self.toggle_execution(start_on_click=True)
-        self.ui.generateSolution.setEnabled(True)
-        self.ui.stopExecution.setEnabled(False)
-        self.ui.tabWidget.setCurrentIndex(1)
+        # self.ui.tabWidget.setCurrentIndex(1)
         self.show_message("Info", "A solution was found.", icon="information")
         return 1
 
@@ -347,13 +347,13 @@ class DorPlan(object):
             )
             return 0
         try:
-            import quarto
+            from quarto import quarto
 
             quarto.find_quarto()
-        except:
+        except Exception as err:
             self.show_message(
                 "Error",
-                "Quarto is not installed/available. Please install support for reports, i.e., pip install dorplan[reports]",
+                f"Quarto is not installed/available. Please install support for reports, i.e., pip install dorplan[reports]\n{err}",
             )
             return 0
         self.ui.solution_report.clear()
@@ -446,6 +446,7 @@ class DorPlan(object):
         # self.toggle_execution(start_on_click=True)
 
     def toggle_execution(self, start_on_click=True):
+        # TODO: Toggling objects crashes the app for whatever reason
         if start_on_click:
             self.ui.generateSolution.setText("Generate plan")
             self.ui.generateSolution.clicked.connect(self.generate_solution)

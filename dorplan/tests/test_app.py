@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from .data.graph_coloring import GraphColoring
+from dorplan.tests.data.graph_coloring import GraphColoring
 from dorplan.app import DorPlan
 
 

@@ -1,7 +1,8 @@
-from base_worker import BaseWorker, StreamLogger
+from .base_worker import BaseWorker, StreamLogger
 import sys
+import os
 from PySide6 import QtCore
-from tools import stdout_redirected
+from .tools import stdout_redirected
 
 
 class RepWorker(BaseWorker):
@@ -15,14 +16,14 @@ class RepWorker(BaseWorker):
         rep_path = ""
         success = False
         try:
+            Experiment = self.my_app.get_solver(self.my_app.get_default_solver_name())
+            experiment = Experiment(self._instance, self.solution)
+            self.status.emit("Task started!")
+            self.started.emit()
+            if not os.path.exists(self.log_name):
+                open(self.log_name, "w").close()
+            # we redirect the stdout to the log file, so that we can see the progress in the GUI
             with open(self.log_name, "a") as f, stdout_redirected(f, sys.stderr):
-                Experiment = self.my_app.get_solver(
-                    self.my_app.get_default_solver_name()
-                )
-                experiment = Experiment(self._instance, self.solution)
-                # self.options["log_handler"] = self.text_browser_handler
-                self.status.emit("Task started!")
-                self.started.emit()
                 rep_path = experiment.generate_report("report")
         except:
             import traceback

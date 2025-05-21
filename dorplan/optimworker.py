@@ -2,7 +2,10 @@ from cornflow_client.constants import (
     STATUS_UNDEFINED,
     SOLUTION_STATUS_INFEASIBLE,
 )
-from base_worker import BaseWorker
+from .base_worker import BaseWorker
+from .tools import stdout_redirected
+import os
+import sys
 from PySide6 import QtCore
 
 
@@ -26,12 +29,28 @@ class OptimWorker(BaseWorker):
             my_solver = self.my_app.get_solver(self.solver_name)
             # we configure the callback object and tie it to the solver and the worker
             try:
-                self.my_callback_obj = my_solver.getStopOnUser_callback()
-                self.options["stop_condition"] = self.my_callback_obj
-            except:
+                # we need to attach the object to self so that it persists
+                self.options["stop_condition"] = self.my_callback_obj = (
+                    my_solver.getStopOnUser_callback()
+                )
+            except AttributeError:
+                # not all solvers have a callback object
                 pass
-            experiment = my_solver(self._instance, self.solution)
-            status = experiment.solve(self.options)
+
+            # we redirect the stdout to the log file, so that we can see the progress in the GUI
+            # if logPath is not provided for whatever reason, we create a log file in the current directory
+            path_to_log = self.options.get("logPath", "log.txt")
+            if not os.path.exists(path_to_log):
+                open(path_to_log, "w").close()
+
+            with (
+                open(path_to_log, "a") as f,
+                stdout_redirected(f, sys.stderr),
+                stdout_redirected(f, sys.stdout),
+            ):
+                experiment = my_solver(self._instance, self.solution)
+                status = experiment.solve(self.options)
+
             self.solution = experiment.solution
 
         except:
