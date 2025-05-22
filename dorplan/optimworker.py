@@ -18,6 +18,7 @@ class OptimWorker(BaseWorker):
         self.solver_name: str = options.get("solver")
         self.my_callback_obj = None
         self.options = dict(options)
+        self.log_name = None
 
     def run(self):
         status = dict(status=STATUS_UNDEFINED, status_sol=SOLUTION_STATUS_INFEASIBLE)
@@ -39,14 +40,14 @@ class OptimWorker(BaseWorker):
 
             # we redirect the stdout to the log file, so that we can see the progress in the GUI
             # if logPath is not provided for whatever reason, we create a log file in the current directory
-            path_to_log = self.options.get("logPath", "log.txt")
-            if not os.path.exists(path_to_log):
-                open(path_to_log, "w").close()
+            self.log_name = self.options.get("logPath", "log.txt")
+            if not os.path.exists(self.log_name):
+                open(self.log_name, "w").close()
 
             with (
-                open(path_to_log, "a") as f,
-                stdout_redirected(f, sys.stderr),
+                open(self.log_name, "a") as f,
                 stdout_redirected(f, sys.stdout),
+                stdout_redirected(f, sys.stderr),
             ):
                 experiment = my_solver(self._instance, self.solution)
                 status = experiment.solve(self.options)

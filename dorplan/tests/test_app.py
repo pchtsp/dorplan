@@ -118,6 +118,16 @@ class AppTest(unittest.TestCase):
                 dummy_ui.stopExecution.setEnabled.assert_called_with(True)
 
     # Add more tests for other methods as needed, mocking file dialogs, etc.
+    def test_solve(self):
+        app = GraphColoring()
+        data = app.test_cases[0]
+        for solver_name in ["pulp", "ortools"]:
+            experiment = app.solvers[solver_name](
+                app.instance.from_dict(data["instance"])
+            )
+            experiment.solve({})
+            experiment.check_solution()
+            experiment.get_objective()
 
 
 if __name__ == "__main__":

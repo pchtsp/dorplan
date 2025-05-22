@@ -38,13 +38,16 @@ import matplotlib.pyplot as plt
 from matplotlib import colormaps
 
 extension = os.path.splitext(file_name)[1]
+app = GraphColoring()
+solver_name = app.get_default_solver_name()
+solver = app.solvers[solver_name]
 if extension=='':
   # it's an instance, so we should solve it, I guess
-  my_instance = GraphColoring.instance.from_txt_file(file_name)
-  my_experiment = GraphColoring.solvers['default'](instance=my_instance, solution=None)
+  my_instance = app.instance.from_txt_file(file_name)
+  my_experiment = solver(instance=my_instance, solution=None)
   status = my_experiment.solve({'timeLimit': 5})
 elif extension=='.json':
-  my_experiment = GraphColoring.solvers['default'].from_json(file_name)
+  my_experiment = solver.from_json(file_name)
   my_instance = my_experiment.instance
 else:
   raise ValueError("Unknown extension: {}".format(extension))

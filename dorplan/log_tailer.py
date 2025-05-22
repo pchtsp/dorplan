@@ -31,7 +31,9 @@ class LogTailer(QtCore.QObject):
 
     @QtCore.Slot()
     def stop(self):
-        # print("stop called")
+        # we update the log one last time
+        self.update_log()
+        # we stop the timer
         self.timer.stop()
         # we delete the log file, unless we configure not to
         if not self.keepLogFile and os.path.exists(self.file_path):

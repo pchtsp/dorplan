@@ -1,7 +1,7 @@
 import sys
 import webbrowser
 from PySide6 import QtWidgets, QtCore, QtGui
-from cornflow_client import ApplicationCore, InstanceCore, SolutionCore
+from cornflow_client import ApplicationCore, InstanceCore, SolutionCore, ExperimentCore
 from cornflow_client.constants import (
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
@@ -19,18 +19,19 @@ import copy
 
 
 class DorPlan(object):
+    app: QtWidgets.QApplication
+    ui: Ui_MainWindow
     opt_worker: OptimWorker
     rep_worker: RepWorker
     my_log_tailer: LogTailer
     my_app: ApplicationCore
-    options: dict
-    app: QtWidgets.QApplication
-    ui: Ui_MainWindow
-    excel_path: str
     Instance: Type[InstanceCore]
     Solution: Type[SolutionCore]
+    Experiment: Type[ExperimentCore]
     instance: InstanceCore | None
     solution: SolutionCore | None
+    options: dict
+    excel_path: str
 
     def __init__(
         self,
@@ -80,7 +81,13 @@ class DorPlan(object):
 
         # below buttons:
         self.ui.chooseFile.clicked.connect(self.choose_file)
-        self.ui.loadTest.clicked.connect(self.load_test)
+        self.ui.loadTest.setMenu(None)  # Remove any existing menu
+        self.ui.loadTest.clicked.disconnect()  # Remove previous connection if any
+        if len(self.my_app.test_cases) > 1:
+            # if there's more than one test case, we show a menu
+            self.ui.loadTest.clicked.connect(self.show_load_test_menu)
+        else:
+            self.ui.loadTest.clicked.connect(self.load_test)
 
         self.ui.checkSolution.clicked.connect(self.check_solution)
         self.ui.exportSolution.clicked.connect(self.export_solution)
@@ -107,13 +114,15 @@ class DorPlan(object):
         MainWindow.show()
         self.app.exec()
 
-    def load_test(self):
+    def load_test(self, test_num: int = 0):
 
         test_cases = self.my_app.test_cases
-        my_case = test_cases[0]
+        my_case = test_cases[test_num]
         self.instance = self.Instance.from_dict(my_case["instance"])
         if "solution" in my_case and my_case["solution"]:
             self.solution = self.Solution.from_dict(my_case["solution"])
+        else:
+            self.solution = None
         self.update_ui()
 
     def update_options(self):
@@ -347,12 +356,15 @@ class DorPlan(object):
             return 0
         try:
             from quarto import quarto
+            import papermill
 
             quarto.find_quarto()
         except Exception as err:
             self.show_message(
                 "Error",
-                f"Quarto is not installed/available. Please install support for reports, i.e., pip install dorplan[reports]\n{err}",
+                f"Quarto is not installed/available. Please install support for reports, i.e., pip install dorplan[reports]\n"
+                f"On Windows, you need to also manually download and install Quarto (https://quarto.org/docs/download/).\n"
+                f"{err}",
             )
             return 0
         self.ui.solution_report.clear()
@@ -464,11 +476,21 @@ class DorPlan(object):
 
         # Perform actions based on the selected tab
         if tab_name == "Statistics":
+            if self.solution is None:
+                return
             experiment = self.Experiment(self.instance, self.solution)
             errors = experiment.check_solution()
             sum_errors = sum(len(v) for v in errors.values())
             self.ui.objectiveLineEdit.setText(f"{experiment.get_objective()}")
             self.ui.errorsLineEdit.setText(f"{sum_errors}")
+
+    def show_load_test_menu(self):
+        menu = QtWidgets.QMenu(self.ui.loadTest)
+        for i, case in enumerate(self.my_app.test_cases):
+            action = menu.addAction(f"Test case {i + 1}")
+            action.triggered.connect(lambda checked=False, idx=i: self.load_test(idx))
+        # Show menu below the button
+        menu.exec(self.ui.loadTest.mapToGlobal(self.ui.loadTest.rect().bottomLeft()))
 
 
 def get_file_dialog(my_dir: str, load=True):

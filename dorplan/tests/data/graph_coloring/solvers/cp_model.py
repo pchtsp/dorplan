@@ -31,6 +31,9 @@ class OrToolsCP(Experiment):
         model.AddMaxEquality(obj_var, color.values())
         model.Minimize(obj_var)
         solver = cp_model.CpSolver()
+        solver.parameters.log_search_progress = True
+        # solver.log_callback = print
+        solver.parameters.log_to_stdout = True
         solver.parameters.max_time_in_seconds = options.get("timeLimit", 10)
         termination_condition = solver.Solve(model)
         if termination_condition not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:

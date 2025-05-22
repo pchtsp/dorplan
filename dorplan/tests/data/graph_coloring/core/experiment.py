@@ -4,7 +4,6 @@ from pytups import TupList
 from .instance import Instance
 from .solution import Solution
 import os
-import quarto
 import tempfile
 import json
 
@@ -58,6 +57,8 @@ class Experiment(ExperimentCore):
         except FileNotFoundError:
             pass
         try:
+            import quarto
+
             quarto.quarto.find_quarto()
         except FileNotFoundError:
             raise ModuleNotFoundError("Quarto is not installed.")
@@ -77,7 +78,7 @@ class Experiment(ExperimentCore):
             report_name = os.path.join(
                 os.path.dirname(__file__), "../report/", report_name
             )
-
+        import quarto
         return self.generate_report_quarto(quarto, report_name=report_name)
 
     @classmethod

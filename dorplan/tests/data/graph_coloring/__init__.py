@@ -3,7 +3,7 @@ from cornflow_client.core.tools import load_json
 from typing import List, Dict
 import os
 
-from .solvers import OrToolsCP
+from .solvers import OrToolsCP, PulpMip
 from .core import Instance, Solution
 
 
@@ -11,7 +11,7 @@ class GraphColoring(ApplicationCore):
     name = "graph_coloring"
     instance = Instance
     solution = Solution
-    solvers = dict(default=OrToolsCP)
+    solvers = dict(ortools=OrToolsCP, pulp=PulpMip)
     schema = load_json(os.path.join(os.path.dirname(__file__), "schemas/config.json"))
 
     @property

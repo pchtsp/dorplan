@@ -11,8 +11,8 @@
         },
         "solver": {
             "type": "string",
-            "enum": ["default"],
-            "default": "default"
+            "enum": ["ortools", "pulp"],
+            "default": "ortools"
         }
     }
 }
