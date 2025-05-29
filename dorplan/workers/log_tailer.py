@@ -1,4 +1,3 @@
-import shutil
 from PySide6 import QtWidgets, QtCore, QtGui
 import os
 
@@ -10,7 +9,7 @@ class LogTailer(QtCore.QObject):
         text_browser: QtWidgets.QTextBrowser,
         interval=1000,
         parent=None,
-        keepLogFile=False,
+        keep_log_file=False,
     ):
         super().__init__(parent)
         self.file_path = file_path
@@ -22,11 +21,10 @@ class LogTailer(QtCore.QObject):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update_log)
         self.last_position = 0
-        self.keepLogFile = keepLogFile
+        self.keep_log_file = keep_log_file
 
     @QtCore.Slot()
     def start(self):
-        # print("start called")
         self.timer.start(self.interval)
 
     @QtCore.Slot()
@@ -36,21 +34,17 @@ class LogTailer(QtCore.QObject):
         # we stop the timer
         self.timer.stop()
         # we delete the log file, unless we configure not to
-        if not self.keepLogFile and os.path.exists(self.file_path):
+        if not self.keep_log_file and os.path.exists(self.file_path):
             os.remove(self.file_path)
 
     @QtCore.Slot()
     def update_log(self):
-        # print("update_log called")
         if not os.path.exists(self.file_path):
-            # print(f"File {self.file_path} does not exist")
             return
         with open(self.file_path, "r") as file:
             file.seek(self.last_position)
             content = file.read()
-            # lines = file.readlines()
             self.last_position = file.tell()
             if content:
-                # self.text_browser.append("".join(lines))
                 self.text_browser.insertPlainText(content)
                 self.text_browser.moveCursor(QtGui.QTextCursor.MoveOperation.End)

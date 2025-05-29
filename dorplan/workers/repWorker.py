@@ -1,4 +1,4 @@
-from .base_worker import BaseWorker, StreamLogger
+from .base_worker import BaseWorker
 import sys
 import os
 from PySide6 import QtCore

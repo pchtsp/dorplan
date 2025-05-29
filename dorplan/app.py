@@ -10,10 +10,10 @@ from cornflow_client.constants import (
 import os
 
 from typing import Type
-from .optimworker import OptimWorker
-from .repWorker import RepWorker
-from .log_tailer import LogTailer
-from .gui import Ui_MainWindow
+from .workers.optimworker import OptimWorker
+from .workers.repWorker import RepWorker
+from .workers.log_tailer import LogTailer
+from .ui.gui import Ui_MainWindow
 
 import copy
 

@@ -1,9 +1,9 @@
 [project]
 name = "dorplan"
-version = "0.2.1"
+version = "0.3.0"
 description = "Desktop OR planner"
 requires-python = ">=3.10"
-dependencies = ["cornflow-client", "orloge", "PySide6", "pulp", "highspy", "ortools", "networkx"]
+dependencies = ["cornflow-client@git+https://github.com/pchtsp/cornflow#subdirectory=libs/client", "orloge", "PySide6", "pulp", "highspy", "ortools", "networkx"]
 authors= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
 maintainers= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
 readme='README.md'
@@ -14,7 +14,6 @@ classifiers= [
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-urls= {source= "https://github.com/pchtsp/orloge", download="https://github.com/pchtsp/orloge/archive/master.zip"}
 
 [project.optional-dependencies]
 reports = [
