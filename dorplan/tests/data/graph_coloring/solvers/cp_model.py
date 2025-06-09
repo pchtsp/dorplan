@@ -1,6 +1,9 @@
 from ortools.sat.python import cp_model
 from cornflow_client.constants import (
-    ORTOOLS_STATUS_MAPPING,
+    STATUS_FEASIBLE,
+    STATUS_INFEASIBLE,
+    STATUS_OPTIMAL,
+    STATUS_UNDEFINED,
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
 )
@@ -36,9 +39,16 @@ class OrToolsCP(Experiment):
         solver.parameters.log_to_stdout = True
         solver.parameters.max_time_in_seconds = options.get("timeLimit", 10)
         termination_condition = solver.Solve(model)
+        ORTOOLS_STATUS_MAPPING = {
+            cp_model.OPTIMAL: STATUS_OPTIMAL,
+            cp_model.FEASIBLE: STATUS_FEASIBLE,
+            cp_model.INFEASIBLE: STATUS_INFEASIBLE,
+        }
         if termination_condition not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
             return dict(
-                status=ORTOOLS_STATUS_MAPPING.get(termination_condition),
+                status=ORTOOLS_STATUS_MAPPING.get(
+                    termination_condition, STATUS_UNDEFINED
+                ),
                 status_sol=SOLUTION_STATUS_INFEASIBLE,
             )
         color_sol = color.vapply(solver.Value)
@@ -47,6 +57,6 @@ class OrToolsCP(Experiment):
         self.solution = Solution(dict(assignment=assign_list))
 
         return dict(
-            status=ORTOOLS_STATUS_MAPPING.get(termination_condition),
+            status=ORTOOLS_STATUS_MAPPING.get(termination_condition, STATUS_UNDEFINED),
             status_sol=SOLUTION_STATUS_FEASIBLE,
         )

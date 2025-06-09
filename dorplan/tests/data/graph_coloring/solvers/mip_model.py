@@ -1,6 +1,10 @@
 import pulp as pl
 from cornflow_client.constants import (
-    PULP_STATUS_MAPPING,
+    STATUS_OPTIMAL,
+    STATUS_INFEASIBLE,
+    STATUS_UNDEFINED,
+    STATUS_NOT_SOLVED,
+    STATUS_UNBOUNDED,
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
 )
@@ -69,6 +73,13 @@ class PulpMip(Experiment):
             solver = pl.HiGHS(msg=True, timeLimit=options.get("timeLimit", 10))
 
         termination_condition = model.solve(solver)
+        PULP_STATUS_MAPPING = {
+            pl.LpStatusOptimal: STATUS_OPTIMAL,
+            pl.LpStatusInfeasible: STATUS_INFEASIBLE,
+            pl.LpStatusUnbounded: STATUS_UNBOUNDED,
+            pl.LpStatusNotSolved: STATUS_NOT_SOLVED,
+            pl.LpStatusUndefined: STATUS_UNDEFINED,
+        }
         if termination_condition not in [pl.LpStatusOptimal]:
             return dict(
                 status=PULP_STATUS_MAPPING.get(termination_condition),

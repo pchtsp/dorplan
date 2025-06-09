@@ -11,14 +11,14 @@ Running uv or pip should work:
 
 Using uv:
 
-```commandline
-uv install dorplan
+```
+uv install dorplan[example]
 ```
 
 If reports are required, install the reports dependencies:
 
 ```
-uv install dorplan[reports]
+uv install dorplan[example, reports]
 ```
 
 In the case of windows, you will also need to install quarto separately. You can find the instructions [here](https://quarto.org/docs/download/).
@@ -27,16 +27,16 @@ This is until the quarto team fixes this issue: https://github.com/quarto-dev/qu
 
 Using pip
 
-```commandline
-python -m pip install dorplan
+```
+python -m pip install dorplan[example]
 ```
 
 ## Testing
 
 If you want to test the example app, run:
 
-```commandline
-python -m unittest dorplan.tests.test_app.AppTest.test_open_app
+```
+uv run python dorplan/example/example.py
 ```
 
 ## Functionality

@@ -79,6 +79,7 @@ class Experiment(ExperimentCore):
                 os.path.dirname(__file__), "../report/", report_name
             )
         import quarto
+
         return self.generate_report_quarto(quarto, report_name=report_name)
 
     @classmethod

@@ -83,10 +83,11 @@ class DorPlan(object):
         self.ui.chooseFile.clicked.connect(self.choose_file)
         self.ui.loadTest.setMenu(None)  # Remove any existing menu
         self.ui.loadTest.clicked.disconnect()  # Remove previous connection if any
-        if len(self.my_app.test_cases) > 1:
+        num_tests = len(self.my_app.test_cases)
+        if num_tests > 1:
             # if there's more than one test case, we show a menu
             self.ui.loadTest.clicked.connect(self.show_load_test_menu)
-        else:
+        elif num_tests == 1:
             self.ui.loadTest.clicked.connect(self.load_test)
 
         self.ui.checkSolution.clicked.connect(self.check_solution)
