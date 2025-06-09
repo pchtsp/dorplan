@@ -28,4 +28,4 @@ jobs:
         sudo apt update -qq
         sudo apt install -qq freeglut3-dev
     - name: Test
-      run: uv run --group dev python -m unittest discover -s dorplan.tests
+      run: uv run --group dev --all-extras python -m unittest discover -s dorplan.tests
