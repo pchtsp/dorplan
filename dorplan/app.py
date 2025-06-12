@@ -32,14 +32,16 @@ class DorPlan(object):
     solution: SolutionCore | None
     options: dict
     excel_path: str
+    force_log_redirect_win: bool
 
     def __init__(
         self,
         optim_app: Type[ApplicationCore],
         options: dict,
         ui: Type[Ui_MainWindow] | None = None,
-        icon_file: str="my_icon.ico",
-        app_name: str|None=None,
+        icon_file: str = "my_icon.ico",
+        app_name: str | None = None,
+        force_log_redirect_win: bool = False,
     ):
         # handle solving in thread
         # self.thread = None
@@ -53,6 +55,7 @@ class DorPlan(object):
         self.Solution = self.my_app.solution
         self.options = options
         self.app = QtWidgets.QApplication(sys.argv)
+        self.force_log_redirect_win = force_log_redirect_win
         MainWindow = QtWidgets.QMainWindow()
 
         if getattr(sys, "frozen", False):
@@ -286,6 +289,7 @@ class DorPlan(object):
             self.instance.to_dict(),
             solution_json_str,
             copy.deepcopy(options),
+            force_log_redirect_win=self.force_log_redirect_win,
         )
         # self.opt_worker.setObjectName("test thread")
 
@@ -532,4 +536,3 @@ if __name__ == "__main__":
     # pyside6-uic ihtc2024/ui/gui/gui.ui -o ihtc2024/ui/gui/gui.py
 
     pass
-

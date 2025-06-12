@@ -5,7 +5,6 @@ import os
 import platform
 
 
-
 def fileno(file_or_fd: TextIOWrapper):
     fd = getattr(file_or_fd, "fileno", lambda: file_or_fd)()
     if fd is None:
@@ -16,11 +15,15 @@ def fileno(file_or_fd: TextIOWrapper):
 
 
 @contextmanager
-def stdout_redirected(to: TextIOWrapper | str = os.devnull, stdout=None):
+def stdout_redirected(
+    to: TextIOWrapper | str = os.devnull, stdout=None, force_log_redirect_win=False
+):
     if stdout is None:
         stdout = sys.stdout
     # Special handling for Windows to avoid PyInstaller issues
-    windows_pyinstaller = getattr(sys, "frozen", False) and platform.system() == "Windows"
+    windows_pyinstaller = platform.system() == "Windows" and (
+        getattr(sys, "frozen", False) or force_log_redirect_win
+    )
 
     if windows_pyinstaller:
         original_write = stdout.write
@@ -69,4 +72,3 @@ def stdout_redirected(to: TextIOWrapper | str = os.devnull, stdout=None):
                     # NOTE: dup2 makes stdout_fd inheritable unconditionally
                     stdout.flush()
                     os.dup2(copied.fileno(), stdout_fd)  # $ exec >&copied
-

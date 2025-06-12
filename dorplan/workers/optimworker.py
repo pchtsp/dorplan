@@ -13,12 +13,22 @@ class OptimWorker(BaseWorker):
     options: dict
     finished = QtCore.Signal(bool, int, dict)
 
-    def __init__(self, my_app, instance, solution, options: dict, *args, **kwargs):
+    def __init__(
+        self,
+        my_app,
+        instance,
+        solution,
+        options: dict,
+        force_log_redirect_win=False,
+        *args,
+        **kwargs,
+    ):
         BaseWorker.__init__(self, my_app, instance, solution, *args, **kwargs)
         self.solver_name: str = options.get("solver")
         self.my_callback_obj = None
         self.options = dict(options)
         self.log_name = None
+        self.force_log_redirect_win = force_log_redirect_win
 
     def run(self):
         status = dict(status=STATUS_UNDEFINED, status_sol=SOLUTION_STATUS_INFEASIBLE)
@@ -46,8 +56,8 @@ class OptimWorker(BaseWorker):
 
             with (
                 open(self.log_name, "a") as f,
-                stdout_redirected(f, sys.stdout),
-                stdout_redirected(f, sys.stderr),
+                stdout_redirected(f, sys.stdout, self.force_log_redirect_win),
+                stdout_redirected(f, sys.stderr, self.force_log_redirect_win),
             ):
                 experiment = my_solver(self._instance, self.solution)
                 status = experiment.solve(self.options)
