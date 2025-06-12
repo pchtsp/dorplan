@@ -38,7 +38,6 @@ class Ui_MainWindow(object):
 "        padding: 10px 20px;\n"
 "        text-align: center;\n"
 "        text-decoration: none;\n"
-"        display: inline-block;\n"
 "        font-size: 14px;\n"
 "        margin: 4px 2px;\n"
 "        border-radius: 12px;\n"
