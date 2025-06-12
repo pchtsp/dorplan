@@ -21,9 +21,9 @@ import copy
 class DorPlan(object):
     app: QtWidgets.QApplication
     ui: Ui_MainWindow
-    opt_worker: OptimWorker
-    rep_worker: RepWorker
-    my_log_tailer: LogTailer
+    opt_worker: OptimWorker | None
+    rep_worker: RepWorker | None
+    my_log_tailer: LogTailer | None
     my_app: ApplicationCore
     Instance: Type[InstanceCore]
     Solution: Type[SolutionCore]
