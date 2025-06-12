@@ -3,7 +3,7 @@ from dorplan.app import DorPlan
 
 
 def test_open_app_gui():
-    DorPlan(GraphColoring, {})
+    DorPlan(GraphColoring, {}, app_name="Graph Coloring")
     return 1
 
 

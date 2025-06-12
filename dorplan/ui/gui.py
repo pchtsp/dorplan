@@ -41,8 +41,6 @@ class Ui_MainWindow(object):
 "        display: inline-block;\n"
 "        font-size: 14px;\n"
 "        margin: 4px 2px;\n"
-"        transition-duration: 0.4s;\n"
-"        cursor: pointer;\n"
 "        border-radius: 12px;\n"
 "    }\n"
 "    QPushButton:hover {\n"

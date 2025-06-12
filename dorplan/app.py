@@ -38,6 +38,8 @@ class DorPlan(object):
         optim_app: Type[ApplicationCore],
         options: dict,
         ui: Type[Ui_MainWindow] | None = None,
+        icon_file: str="my_icon.ico",
+        app_name: str|None=None,
     ):
         # handle solving in thread
         # self.thread = None
@@ -53,20 +55,26 @@ class DorPlan(object):
         self.app = QtWidgets.QApplication(sys.argv)
         MainWindow = QtWidgets.QMainWindow()
 
-        # set icon
         if getattr(sys, "frozen", False):
             scriptDir = sys._MEIPASS
             self.examplesDir = scriptDir + "/examples/"
         else:
             scriptDir = os.path.dirname(os.path.realpath(__file__))
             self.examplesDir = scriptDir + "/../../../../results/"
-        icon_path = os.path.join(scriptDir, "plane.ico")
-        MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
+        self.excel_path = scriptDir
+
         if ui is None:
             ui = Ui_MainWindow
         self.ui = ui()
         self.ui.setupUi(MainWindow)
-        self.excel_path = "./"
+
+        if app_name is not None:
+            MainWindow.setWindowTitle(app_name)
+
+        # set icon
+        icon_path = os.path.join(scriptDir, icon_file)
+        if os.path.exists(icon_path):
+            MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
 
         self.instance = None
         self.solution = None
@@ -451,11 +459,10 @@ class DorPlan(object):
 
     @QtCore.Slot()
     def optim_failed(self, text):
-        if self.my_log_tailer:
-            self.my_log_tailer.stop()
         self.ui.solution_log.insertPlainText(text)
         self.ui.solution_log.moveCursor(QtGui.QTextCursor.MoveOperation.End)
-        # self.toggle_execution(start_on_click=True)
+        if self.my_log_tailer:
+            self.my_log_tailer.stop()
 
     def toggle_execution(self, start_on_click=True):
         # TODO: Toggling objects crashes the app for whatever reason
@@ -525,3 +532,4 @@ if __name__ == "__main__":
     # pyside6-uic ihtc2024/ui/gui/gui.ui -o ihtc2024/ui/gui/gui.py
 
     pass
+
