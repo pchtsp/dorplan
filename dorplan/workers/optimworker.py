@@ -1,4 +1,4 @@
-from cornflow_client.constants import (
+from cornflow_client.constants import (  # type: ignore[import-untyped]
     STATUS_UNDEFINED,
     SOLUTION_STATUS_INFEASIBLE,
 )
@@ -24,7 +24,7 @@ class OptimWorker(BaseWorker):
         **kwargs,
     ):
         BaseWorker.__init__(self, my_app, instance, solution, *args, **kwargs)
-        self.solver_name: str = options.get("solver")
+        self.solver_name: str = options["solver"]
         self.my_callback_obj = None
         self.options = dict(options)
         self.log_name = None

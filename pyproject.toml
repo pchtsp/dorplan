@@ -1,6 +1,6 @@
 [project]
 name = "dorplan"
-version = "0.5.5"
+version = "0.6.0"
 description = "Desktop OR planner"
 requires-python = ">=3.10"
 dependencies = [
@@ -49,6 +49,7 @@ packages = [
 "dorplan.tests.data.graph_coloring.data"= ["*"]
 "dorplan.tests.data.graph_coloring.report"= ["*.qmd"]
 "dorplan.tests.data.graph_coloring.schemas"= ["*.json"]
+"dorplan" = ["py.typed"]
 
 [dependency-groups]
-dev = ["black"]
+dev = ["black", "mypy", "types-networkx"]

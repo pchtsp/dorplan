@@ -1,5 +1,5 @@
-import pulp as pl
-from cornflow_client.constants import (
+import pulp as pl  # type: ignore[import-untyped]
+from cornflow_client.constants import (  # type: ignore[import-untyped]
     STATUS_OPTIMAL,
     STATUS_INFEASIBLE,
     STATUS_UNDEFINED,
@@ -8,7 +8,7 @@ from cornflow_client.constants import (
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
 )
-import pytups as pt
+import pytups as pt  # type: ignore[import-untyped]
 from ..core import Solution, Experiment
 
 

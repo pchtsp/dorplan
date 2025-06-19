@@ -5,7 +5,7 @@ import os
 import platform
 
 
-def fileno(file_or_fd: TextIOWrapper):
+def fileno(file_or_fd: TextIOWrapper | str):
     fd = getattr(file_or_fd, "fileno", lambda: file_or_fd)()
     if fd is None:
         raise ValueError("Expected a file (`.fileno()`) or a file descriptor")
@@ -63,6 +63,7 @@ def stdout_redirected(
                 try:
                     os.dup2(fileno(to), stdout_fd)  # $ exec >&to
                 except ValueError:  # filename
+                    to = str(to)
                     with open(to, "wb") as to_file:
                         os.dup2(to_file.fileno(), stdout_fd)  # $ exec > to
                 try:

@@ -1,7 +1,7 @@
 import os
-from cornflow_client import SolutionCore
-from cornflow_client.core.tools import load_json
-import pytups as pt
+from cornflow_client import SolutionCore  # type: ignore[import-untyped]
+from cornflow_client.core.tools import load_json  # type: ignore[import-untyped]
+import pytups as pt  # type: ignore[import-untyped]
 
 
 class Solution(SolutionCore):

@@ -1,6 +1,6 @@
-from cornflow_client import ExperimentCore
-from cornflow_client.core.tools import load_json
-from pytups import TupList
+from cornflow_client import ExperimentCore  # type: ignore[import-untyped]
+from cornflow_client.core.tools import load_json  # type: ignore[import-untyped]
+from pytups import TupList  # type: ignore[import-untyped]
 from .instance import Instance
 from .solution import Solution
 import os
@@ -41,7 +41,7 @@ class Experiment(ExperimentCore):
         ]
         return dict(pairs=errors, missing=missing_colors)
 
-    def generate_report_quarto(self, quarto, report_name: str = "report") -> str:
+    def generate_report_quarto(self, report_name: str = "report") -> str:
         # it returns the path to the file being written
 
         # a user may give the full "report.qmd" name.
@@ -57,7 +57,7 @@ class Experiment(ExperimentCore):
         except FileNotFoundError:
             pass
         try:
-            import quarto
+            import quarto  # type: ignore[import-untyped]
 
             quarto.quarto.find_quarto()
         except FileNotFoundError:
@@ -78,9 +78,8 @@ class Experiment(ExperimentCore):
             report_name = os.path.join(
                 os.path.dirname(__file__), "../report/", report_name
             )
-        import quarto
 
-        return self.generate_report_quarto(quarto, report_name=report_name)
+        return self.generate_report_quarto(report_name=report_name)
 
     @classmethod
     def from_dict(cls, data: dict):

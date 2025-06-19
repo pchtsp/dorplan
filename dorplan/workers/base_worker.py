@@ -1,29 +1,6 @@
 from PySide6 import QtCore
 import logging
-from cornflow_client import ApplicationCore
-
-
-class SignalLogger(logging.Handler):
-    def __init__(self, signal):
-        super().__init__()
-        self.signal = signal
-
-    def emit(self, record):
-        msg: str = self.format(record)
-        self.signal.emit(msg)
-
-
-class StreamLogger:
-    def __init__(self, signal):
-        self.signal = signal
-
-    def write(self, message):
-        print("writing message")
-        if message.strip():
-            self.signal.emit(message)
-
-    def flush(self):
-        pass
+from cornflow_client import ApplicationCore  # type: ignore[import-untyped]
 
 
 class BaseWorker(QtCore.QThread):

@@ -1,8 +1,8 @@
 import sys
 import webbrowser
 from PySide6 import QtWidgets, QtCore, QtGui
-from cornflow_client import ApplicationCore, InstanceCore, SolutionCore, ExperimentCore
-from cornflow_client.constants import (
+from cornflow_client import ApplicationCore, InstanceCore, SolutionCore, ExperimentCore  # type: ignore[import-untyped]
+from cornflow_client.constants import (  # type: ignore[import-untyped]
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
 )
@@ -42,9 +42,8 @@ class DorPlan(object):
         icon_file: str = "my_icon.ico",
         app_name: str | None = None,
         force_log_redirect_win: bool = False,
+        datasets_dir: str | None = None,
     ):
-        # handle solving in thread
-        # self.thread = None
         self.opt_worker = None
         self.rep_worker = None
         self.my_log_tailer = None
@@ -58,13 +57,12 @@ class DorPlan(object):
         self.force_log_redirect_win = force_log_redirect_win
         MainWindow = QtWidgets.QMainWindow()
 
-        if getattr(sys, "frozen", False):
-            scriptDir = sys._MEIPASS
-            self.examplesDir = scriptDir + "/examples/"
-        else:
-            scriptDir = os.path.dirname(os.path.realpath(__file__))
-            self.examplesDir = scriptDir + "/../../../../results/"
-        self.excel_path = scriptDir
+        if datasets_dir is None:
+            if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", None):
+                datasets_dir = sys._MEIPASS
+            else:
+                datasets_dir = os.path.dirname(os.path.realpath(__file__))
+        self.excel_path = datasets_dir
 
         if ui is None:
             ui = Ui_MainWindow
@@ -75,7 +73,7 @@ class DorPlan(object):
             MainWindow.setWindowTitle(app_name)
 
         # set icon
-        icon_path = os.path.join(scriptDir, icon_file)
+        icon_path = os.path.join(datasets_dir, icon_file)
         if os.path.exists(icon_path):
             MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
 
@@ -93,7 +91,6 @@ class DorPlan(object):
         # below buttons:
         self.ui.chooseFile.clicked.connect(self.choose_file)
         self.ui.loadTest.setMenu(None)  # Remove any existing menu
-        self.ui.loadTest.clicked.disconnect()  # Remove previous connection if any
         num_tests = len(self.my_app.test_cases)
         if num_tests > 1:
             # if there's more than one test case, we show a menu
@@ -126,7 +123,7 @@ class DorPlan(object):
         MainWindow.show()
         self.app.exec()
 
-    def load_test(self, test_num: int = 0):
+    def load_test(self, test_num: int = 0) -> None:
 
         test_cases = self.my_app.test_cases
         my_case = test_cases[test_num]
@@ -137,16 +134,16 @@ class DorPlan(object):
             self.solution = None
         self.update_ui()
 
-    def update_options(self):
+    def update_options(self) -> bool:
         try:
             self.options["timeLimit"] = int(self.ui.max_time.text())
             self.options["debug"] = self.ui.log_level.currentIndex() == 1
             self.options["solver"] = self.ui.solver.currentText()
         except:
-            return 0
-        return 1
+            return False
+        return True
 
-    def update_ui(self):
+    def update_ui(self) -> bool:
         self.ui.max_time.setText(str(self.options.get("timeLimit", 60)))
         if self.instance is None:
             self.ui.instCheck.setText("No instance loaded")
@@ -164,18 +161,15 @@ class DorPlan(object):
             self.ui.solCheck.setStyleSheet("QLabel { color : green; }")
             self.ui.reuse_sol.setEnabled(True)
             self.ui.reuse_sol.setChecked(True)
-        return 1
+        return True
 
-    def choose_file(self):
-        file_name = get_file_dialog(self.examplesDir)
+    def choose_file(self) -> bool:
+        my_directory = os.path.dirname(self.excel_path)
+        file_name = get_file_dialog(my_directory)
         # we update the examplesDir to the directory of the file
         actual_file_name = file_name[0]
         if not actual_file_name:
             return False
-        self.examplesDir = os.path.dirname(actual_file_name)
-        # if os.path.isfile(dirName):
-        #     dirName = os.path.dirname(dirName)
-        # exec.udpdate_case_read_options(self.options, dirName + "/")
         self.excel_path = actual_file_name
         self.load_template(actual_file_name)
         self.update_ui()
@@ -184,16 +178,16 @@ class DorPlan(object):
     def read_dir(self):
         self.load_template(self.excel_path)
 
-    def show_message(self, title, text, icon="critical"):
+    def show_message(self, title: str, text: str, icon: str = "critical") -> None:
         msg = QtWidgets.QMessageBox()
         if icon == "critical":
-            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
         msg.setText(text)
         msg.setWindowTitle(title)
         retval = msg.exec()
         return
 
-    def load_jsons(self, path):
+    def load_jsons(self, path: str) -> bool:
         try:
             my_instance = self.Instance.from_json(path)
             if my_instance.data:
@@ -201,7 +195,7 @@ class DorPlan(object):
                 self.solution = None
             else:
                 raise Exception("No data in instance")
-            return 1
+            return True
         except:
             try:
                 my_solution = self.Solution.from_json(path)
@@ -213,20 +207,20 @@ class DorPlan(object):
                     text="There's been an error reading the file:\n{}.".format(e),
                     icon="critical",
                 )
-                return 0
-        return 1
+                return False
+        return True
 
-    def load_template(self, file_name):
-        base, ext = os.path.splitext(file_name)
-        if ext == ".json":
-            return self.load_jsons(file_name)
-
+    def load_template(self, file_name: str):
         if not os.path.exists(file_name):
             self.show_message(
                 title="Missing files",
                 text=f"File {file_name} does not exist.",
             )
-            return
+            return False
+        base, ext = os.path.splitext(file_name)
+        if ext == ".json":
+            return self.load_jsons(file_name)
+
         try:
             self.instance = self.Instance.from_excel(file_name)
         except Exception as e:
@@ -234,7 +228,7 @@ class DorPlan(object):
                 title="Error reading instance",
                 text="There's been an error reading the instance:\n{}.".format(e),
             )
-            return
+            return False
         try:
             self.solution = self.Solution.from_excel(file_name)
         except Exception as e:
@@ -246,33 +240,48 @@ class DorPlan(object):
             self.solution = None
         return True
 
-    def check_solution(self):
+    def check_solution(self) -> bool:
         if not self.solution:
             self.show_message(
                 title="Missing files", text="No solution is loaded, can't verify it."
             )
-            return
+            return False
         experiment = self.Experiment(self.instance, self.solution)
         errors = experiment.check_solution()
-        errors = {k: v.to_dictdict() for k, v in errors.items()}
         # TODO: show errors in a screen
+        return True
 
+    def check_instance(self) -> None:
+        if not self.instance:
+            self.show_message(
+                title="Missing files", text="No instance is loaded, can't verify it."
+            )
+            return
+        errors = self.instance.check()
+        # TODO: show errors in a screen
+        self.ui.solution_log.clear()
+        if errors:
+            self.ui.solution_log.append("Errors found in the instance:")
+            for k, v in errors.items():
+                self.ui.solution_log.append(f"{k}: {v}")
+        else:
+            self.ui.solution_log.append("No errors found in the instance.")
         return
 
-    def generate_solution(self):
+    def generate_solution(self) -> bool:
         options = dict(self.options)
         if not self.instance:
             self.show_message(
                 title="Loading needed",
                 text="No instance loaded, so not possible to solve.",
             )
-            return
+            return False
         if not options.get("solver"):
             self.show_message(
                 title="Missing solver",
                 text="No solver selected, so not possible to solve.",
             )
-            return
+            return False
         solution = None
         if self.ui.reuse_sol.isChecked():
             solution = self.solution
@@ -308,34 +317,34 @@ class DorPlan(object):
         self.opt_worker.start()
         self.update_ui()
 
-        return 1
+        return True
 
     @QtCore.Slot(bool, int, str)
-    def get_solution(self, success, sol_status, soldata):
+    def get_solution(self, success: bool, sol_status: int, soldata: str) -> bool:
         self.ui.generateSolution.setEnabled(True)
         self.ui.stopExecution.setEnabled(False)
         if not success:
             self.show_message(
                 "Info", "An unexpected error occurred.", icon="information"
             )
-            return 0
+            return False
         if sol_status != SOLUTION_STATUS_FEASIBLE or not soldata:
             self.show_message("Info", "No solution was found.", icon="information")
-            return 0
+            return False
         self.solution = self.Solution.from_dict(soldata)
         self.update_ui()
         # self.toggle_execution(start_on_click=True)
         # self.ui.tabWidget.setCurrentIndex(1)
         self.show_message("Info", "A solution was found.", icon="information")
-        return 1
+        return True
 
-    def export_solution_gen(self, output_path):
+    def export_solution_gen(self, output_path: str) -> bool:
         if not self.instance or not self.solution:
             self.show_message(
                 "Error",
                 "No solution can be exported because there is no loaded solution.",
             )
-            return 0
+            return False
         experiment = self.Experiment(self.instance, self.solution)
         try:
             experiment.to_excel(output_path)
@@ -344,10 +353,10 @@ class DorPlan(object):
                 "Error",
                 "Output file cannot be overwritten.\nCheck it is not open and you have enough permissions.",
             )
-            return 0
+            return False
 
         self.show_message("Success", "Solution successfully exported.", icon="Success")
-        return 1
+        return True
 
     def export_solution(self):
         output_path = self.excel_path
@@ -360,16 +369,16 @@ class DorPlan(object):
             return False
         return self.export_solution_gen(actual_file_name)
 
-    def generate_report(self, path=None):
+    def generate_report(self) -> bool:
         if not self.instance or not self.solution:
             self.show_message(
                 "Error",
                 "No solution can be exported because there is no loaded solution.",
             )
-            return 0
+            return False
         try:
-            from quarto import quarto
-            import papermill
+            from quarto import quarto  # type: ignore[import-untyped]
+            import papermill  # type: ignore[import-untyped]
 
             quarto.find_quarto()
         except Exception as err:
@@ -379,7 +388,7 @@ class DorPlan(object):
                 f"On Windows, you need to also manually download and install Quarto (https://quarto.org/docs/download/).\n"
                 f"{err}",
             )
-            return 0
+            return False
         self.ui.solution_report.clear()
         dirname = os.path.dirname(self.excel_path)
         my_log_file = os.path.join(dirname, "log_report.txt")
@@ -405,13 +414,15 @@ class DorPlan(object):
 
         # start report worker:
         self.rep_worker.start()
+        self.ui.generateReport.setEnabled(False)
 
-        return 1
+        return True
 
-    @QtCore.Slot()
-    def load_report(self, success, rep_path):
+    @QtCore.Slot(bool, str)
+    def load_report(self, success: bool, rep_path: str) -> bool:
+        self.ui.generateReport.setEnabled(True)
         if not success:
-            return 0
+            return False
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(11)
@@ -430,13 +441,13 @@ class DorPlan(object):
                 "Error",
                 "No report was found. Please generate a report first.",
             )
-            return 0
+            return False
         with open(html_file_path, "r", encoding="utf8") as file:
             content = file.read()
             text_browser.setText(content)
         text_browser.show()
         text_browser.raise_()
-        return 1
+        return True
 
     def open_report(self):
         # print("open report")
@@ -450,39 +461,39 @@ class DorPlan(object):
             return 0
         webbrowser.open(f"file://{html_file_path}")
 
-    @QtCore.Slot()
-    def update_report_log(self, message):
+    @QtCore.Slot(str)
+    def update_report_log(self, message: str) -> None:
         self.ui.solution_report.append(message)
         self.ui.solution_report.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
-    def stop_report_generation(self):
-        print("stopping report generation")
-        self.ui.solution_report.append("stopping report generation")
-        self.rep_worker.quit()
-        self.rep_worker.wait()
+    # def stop_report_generation(self) -> None:
+    #     print("stopping report generation")
+    #     self.ui.solution_report.append("stopping report generation")
+    #     self.rep_worker.quit()
+    #     self.rep_worker.wait()
 
-    @QtCore.Slot()
-    def optim_failed(self, text):
+    @QtCore.Slot(str)
+    def optim_failed(self, text: str) -> None:
         self.ui.solution_log.insertPlainText(text)
         self.ui.solution_log.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         if self.my_log_tailer:
             self.my_log_tailer.stop()
 
-    def toggle_execution(self, start_on_click=True):
+    def toggle_execution(self, start_on_click=True) -> bool:
         # TODO: Toggling objects crashes the app for whatever reason
         if start_on_click:
             self.ui.generateSolution.setText("Generate plan")
             self.ui.generateSolution.clicked.connect(self.generate_solution)
-            return
+            return False
         if self.opt_worker:
             # if self.opt_worker and self.opt_worker.isRunning():
             self.ui.generateSolution.setText("Stop execution")
             self.ui.generateSolution.clicked.connect(self.opt_worker.kill)
         # else:
         # print("No worker to stop")
-        return 1
+        return True
 
-    def on_tab_changed(self, index):
+    def on_tab_changed(self, index: int) -> None:
         tab_name = self.ui.tabWidget.tabText(index)
         # print(f"Selected tab: {tab_name}")
 
@@ -496,7 +507,7 @@ class DorPlan(object):
             self.ui.objectiveLineEdit.setText(f"{experiment.get_objective()}")
             self.ui.errorsLineEdit.setText(f"{sum_errors}")
 
-    def show_load_test_menu(self):
+    def show_load_test_menu(self) -> None:
         menu = QtWidgets.QMenu(self.ui.loadTest)
         for i, case in enumerate(self.my_app.test_cases):
             action = menu.addAction(f"Test case {i + 1}")

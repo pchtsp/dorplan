@@ -1,7 +1,7 @@
 import os
-from cornflow_client import InstanceCore, get_empty_schema
-from cornflow_client.core.tools import load_json
-import pytups as pt
+from cornflow_client import InstanceCore, get_empty_schema  # type: ignore[import-untyped]
+from cornflow_client.core.tools import load_json  # type: ignore[import-untyped]
+import pytups as pt  # type: ignore[import-untyped]
 import networkx as nx
 
 

@@ -1,36 +1,25 @@
-from cornflow_client import (
+from cornflow_client import (  # type: ignore[import-untyped]
     get_empty_schema,
     ApplicationCore,
     InstanceCore,
     SolutionCore,
     ExperimentCore,
 )
-from cornflow_client.core.tools import load_json
+from cornflow_client.core.tools import load_json  # type: ignore[import-untyped]
 from typing import List, Dict
 import os
 
+Instance = InstanceCore
 
-try:
-    from .solvers import OrToolsCP, PulpMip
-    from .core import Instance, Solution, Experiment
-except ImportError as e:
-    print(e)
 
-    class GraphColoring(ApplicationCore):
-        name = "graph_coloring"
-        instance = InstanceCore
-        solution = SolutionCore
-        solvers = dict(experiment=ExperimentCore)
-        schema = get_empty_schema(solvers=["experiment"])
+class GraphColoring(ApplicationCore):
+    name = "graph_coloring"
+    try:
+        from .solvers import OrToolsCP, PulpMip
 
-        @property
-        def test_cases(self) -> List[Dict]:
-            return [dict()]
+        global Instance
+        from .core import Instance, Solution, Experiment
 
-else:
-
-    class GraphColoring(ApplicationCore):
-        name = "graph_coloring"
         instance = Instance
         solution = Solution
         solvers = dict(ortools=OrToolsCP, pulp=PulpMip)
@@ -55,3 +44,14 @@ else:
                     "description": "Example data with 50 pairs",
                 },
             ]
+
+    except ImportError as e:
+        print(e)
+        instance = InstanceCore
+        solution = SolutionCore
+        solvers = dict(experiment=ExperimentCore)
+        schema = get_empty_schema(solvers=["experiment"])
+
+        @property
+        def test_cases(self) -> List[Dict]:
+            return [dict()]

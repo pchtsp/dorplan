@@ -1,5 +1,5 @@
 from ortools.sat.python import cp_model
-from cornflow_client.constants import (
+from cornflow_client.constants import (  # type: ignore[import-untyped]
     STATUS_FEASIBLE,
     STATUS_INFEASIBLE,
     STATUS_OPTIMAL,
@@ -7,7 +7,7 @@ from cornflow_client.constants import (
     SOLUTION_STATUS_FEASIBLE,
     SOLUTION_STATUS_INFEASIBLE,
 )
-import pytups as pt
+import pytups as pt  # type: ignore[import-untyped]
 from ..core import Solution, Experiment
 
 
@@ -39,16 +39,14 @@ class OrToolsCP(Experiment):
         solver.parameters.log_to_stdout = True
         solver.parameters.max_time_in_seconds = options.get("timeLimit", 10)
         termination_condition = solver.Solve(model)
-        ORTOOLS_STATUS_MAPPING = {
+        ortools_status_map = {
             cp_model.OPTIMAL: STATUS_OPTIMAL,
             cp_model.FEASIBLE: STATUS_FEASIBLE,
             cp_model.INFEASIBLE: STATUS_INFEASIBLE,
         }
         if termination_condition not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
             return dict(
-                status=ORTOOLS_STATUS_MAPPING.get(
-                    termination_condition, STATUS_UNDEFINED
-                ),
+                status=ortools_status_map.get(termination_condition, STATUS_UNDEFINED),  # type: ignore[call-overload]
                 status_sol=SOLUTION_STATUS_INFEASIBLE,
             )
         color_sol = color.vapply(solver.Value)
@@ -57,6 +55,6 @@ class OrToolsCP(Experiment):
         self.solution = Solution(dict(assignment=assign_list))
 
         return dict(
-            status=ORTOOLS_STATUS_MAPPING.get(termination_condition, STATUS_UNDEFINED),
+            status=ortools_status_map.get(termination_condition, STATUS_UNDEFINED),  # type: ignore[call-overload]
             status_sol=SOLUTION_STATUS_FEASIBLE,
         )
