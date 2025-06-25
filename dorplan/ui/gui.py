@@ -1,3 +1,4 @@
+# fmt: off
 # -*- coding: utf-8 -*-
 
 ################################################################################
@@ -394,7 +395,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.Config.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>configuration</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.max_timeLabel.setText(QCoreApplication.translate("MainWindow", u"Max solving time", None))
+        self.max_timeLabel.setText(QCoreApplication.translate("MainWindow", u"Max solving time (seconds)", None))
         self.max_time.setText(QCoreApplication.translate("MainWindow", u"60", None))
         self.max_time.setPlaceholderText(QCoreApplication.translate("MainWindow", u"60", None))
         self.solverLabel.setText(QCoreApplication.translate("MainWindow", u"Solver", None))
@@ -412,4 +413,3 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Output), QCoreApplication.translate("MainWindow", u"Statistics", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi
-

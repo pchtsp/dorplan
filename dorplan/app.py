@@ -10,9 +10,7 @@ from cornflow_client.constants import (  # type: ignore[import-untyped]
 import os
 
 from typing import Type
-from .workers.optimworker import OptimWorker
-from .workers.repWorker import RepWorker
-from .workers.log_tailer import LogTailer
+from .workers import OptimWorker, RepWorker, LogTailer, OptimWorkerMulti
 from .ui.gui import Ui_MainWindow
 
 import copy
@@ -21,7 +19,7 @@ import copy
 class DorPlan(object):
     app: QtWidgets.QApplication
     ui: Ui_MainWindow
-    opt_worker: OptimWorker | None
+    opt_worker: OptimWorker | OptimWorkerMulti | None
     rep_worker: RepWorker | None
     my_log_tailer: LogTailer | None
     my_app: ApplicationCore
@@ -48,6 +46,7 @@ class DorPlan(object):
         self.rep_worker = None
         self.my_log_tailer = None
 
+        self.my_app_type = optim_app
         self.my_app = optim_app()
         self.Experiment = self.my_app.get_solver(self.my_app.get_default_solver_name())
         self.Instance = self.my_app.instance
@@ -268,7 +267,7 @@ class DorPlan(object):
             self.ui.solution_log.append("No errors found in the instance.")
         return
 
-    def generate_solution(self) -> bool:
+    def generate_solution(self, use_alt_optimworker=False) -> bool:
         options = dict(self.options)
         if not self.instance:
             self.show_message(
@@ -293,8 +292,14 @@ class DorPlan(object):
         solution_json_str = None
         if solution is not None:
             solution_json_str = solution.to_dict()
-        self.opt_worker = OptimWorker(
-            copy.deepcopy(self.my_app),
+        if use_alt_optimworker:
+            my_optim_worker = OptimWorkerMulti
+            self.ui.stopExecution.setText("Kill execution")
+        else:
+            my_optim_worker = OptimWorker
+            self.ui.stopExecution.setText("Stop execution")
+        self.opt_worker = my_optim_worker(
+            self.my_app_type,
             self.instance.to_dict(),
             solution_json_str,
             copy.deepcopy(options),
@@ -306,9 +311,13 @@ class DorPlan(object):
             options["logPath"], self.ui.solution_log, interval=100
         )
         self.opt_worker.started.connect(self.my_log_tailer.start)
-        self.opt_worker.finished.connect(self.my_log_tailer.stop)
         self.opt_worker.finished.connect(self.get_solution)
+        # if we do not invoke deleteLater, the worker emits duplicated signals
+        self.opt_worker.finished.connect(self.opt_worker.deleteLater)
         self.opt_worker.error.connect(self.optim_failed)
+        self.opt_worker.killed.connect(self.optim_killed)
+        self.opt_worker.killed.connect(self.opt_worker.deleteLater)
+
         # self.toggle_execution(start_on_click=False)
         self.ui.stopExecution.clicked.connect(self.opt_worker.kill)
         self.ui.generateSolution.setEnabled(False)
@@ -323,6 +332,8 @@ class DorPlan(object):
     def get_solution(self, success: bool, sol_status: int, soldata: str) -> bool:
         self.ui.generateSolution.setEnabled(True)
         self.ui.stopExecution.setEnabled(False)
+        if self.my_log_tailer:
+            self.my_log_tailer.stop()
         if not success:
             self.show_message(
                 "Info", "An unexpected error occurred.", icon="information"
@@ -393,7 +404,7 @@ class DorPlan(object):
         dirname = os.path.dirname(self.excel_path)
         my_log_file = os.path.join(dirname, "log_report.txt")
         self.rep_worker = RepWorker(
-            self.my_app,
+            self.my_app_type,
             self.instance.to_dict(),
             self.solution.to_dict(),
             log_path=my_log_file,
@@ -408,7 +419,6 @@ class DorPlan(object):
             my_log_file, self.ui.solution_report, interval=100
         )
         self.rep_worker.started.connect(self.my_log_tailer.start)
-        self.rep_worker.finished.connect(self.my_log_tailer.stop)
         self.rep_worker.error.connect(self.update_report_log)
         self.rep_worker.finished.connect(self.load_report)
 
@@ -421,6 +431,8 @@ class DorPlan(object):
     @QtCore.Slot(bool, str)
     def load_report(self, success: bool, rep_path: str) -> bool:
         self.ui.generateReport.setEnabled(True)
+        if self.my_log_tailer:
+            self.my_log_tailer.stop()
         if not success:
             return False
         font = QtGui.QFont()
@@ -471,6 +483,9 @@ class DorPlan(object):
     #     self.ui.solution_report.append("stopping report generation")
     #     self.rep_worker.quit()
     #     self.rep_worker.wait()
+    @QtCore.Slot()
+    def optim_killed(self) -> None:
+        self.optim_failed("Execution killed by user, no solution can be retrieved.")
 
     @QtCore.Slot(str)
     def optim_failed(self, text: str) -> None:
@@ -478,6 +493,11 @@ class DorPlan(object):
         self.ui.solution_log.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         if self.my_log_tailer:
             self.my_log_tailer.stop()
+        self.ui.generateSolution.setEnabled(True)
+        self.ui.stopExecution.setEnabled(False)
+        if self.opt_worker:
+            self.opt_worker.deleteLater()
+            self.opt_worker = None
 
     def toggle_execution(self, start_on_click=True) -> bool:
         # TODO: Toggling objects crashes the app for whatever reason

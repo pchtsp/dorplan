@@ -79,7 +79,7 @@ class OptimWorker(BaseWorker):
             self.finished.emit(success, status["status_sol"], soldata)
 
     def kill(self):
+        # we do not really kill it, we stop it, so we do not call the killed signal
         self.abort = True
         if self.my_callback_obj:
             self.my_callback_obj.stop()
-            self.killed.emit()

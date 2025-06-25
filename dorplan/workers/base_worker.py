@@ -1,6 +1,7 @@
 from PySide6 import QtCore
 import logging
 from cornflow_client import ApplicationCore  # type: ignore[import-untyped]
+from typing import Type
 
 
 class BaseWorker(QtCore.QThread):
@@ -13,17 +14,23 @@ class BaseWorker(QtCore.QThread):
     log_message = QtCore.Signal(str)
 
     def __init__(
-        self, my_app: ApplicationCore, instance: dict, solution: dict, *args, **kwargs
+        self,
+        my_app: Type[ApplicationCore],
+        instance: dict,
+        solution: dict,
+        *args,
+        **kwargs,
     ):
         QtCore.QThread.__init__(self, *args, **kwargs)
         self.abort = False
         self.is_running = True
+        self.my_app = my_app()
 
-        self._instance = my_app.instance.from_dict(instance)
+        self._instance = self.my_app.instance.from_dict(instance)
         self.solution = None
         if solution is not None:
-            self.solution = my_app.solution.from_dict(solution)
-        self.my_app = my_app
+            self.solution = self.my_app.solution.from_dict(solution)
+
         # self.text_browser_handler = SignalLogger(self.log_message)
 
     def run(self):
