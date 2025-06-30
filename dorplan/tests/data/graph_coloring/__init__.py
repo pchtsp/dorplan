@@ -14,15 +14,21 @@ Instance = InstanceCore
 
 class GraphColoring(ApplicationCore):
     name = "graph_coloring"
+
     try:
-        from .solvers import OrToolsCP, PulpMip
+        from .solvers import OrToolsCP, PulpMip, TimefoldPy, NetworkXHeuristic
 
         global Instance
         from .core import Instance, Solution, Experiment
 
         instance = Instance
         solution = Solution
-        solvers = dict(ortools=OrToolsCP, pulp=PulpMip)
+        solvers = dict(
+            ortools=OrToolsCP,
+            pulp=PulpMip,
+            timefold=TimefoldPy,
+            networkx=NetworkXHeuristic,
+        )
         schema = load_json(
             os.path.join(os.path.dirname(__file__), "schemas/config.json")
         )

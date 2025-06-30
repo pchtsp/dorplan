@@ -71,7 +71,10 @@ See @fig-network for a representation of the network of nodes to color.
 #| label: fig-network
 #| fig-cap: "Network with forbidden pairs."
 G = my_instance.get_graph()
-pos = nx.planar_layout(G)
+try:
+    pos = nx.planar_layout(G)
+except nx.NetworkXException:
+    pos = nx.spring_layout(G)
 __nodes = nx.draw_networkx_nodes(G, pos=pos)
 __edges = nx.draw_networkx_edges(G, pos=pos)
 
@@ -100,7 +103,7 @@ feasible = len(checks['missing']) == 0 and len(checks['pairs']) == 0
 # The following code shows (1) a box with feasibility + objective function OR (2) root cause of infeasibility.
 
 if feasible:
-  print("::: {{.callout-tip}}\n\n## Solution is feasible\n\nThe least number of colors is {}.\n\n:::".format(objective))
+  print("::: {{.callout-tip}}\n\n## Solution is feasible\n\nThe least number of colors found is {}.\n\n:::".format(objective))
 else:
   my_text = ""
   if checks['missing']:

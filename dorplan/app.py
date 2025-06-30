@@ -79,6 +79,9 @@ class DorPlan(object):
         self.instance = None
         self.solution = None
 
+        # I set the options for the solver combo box, this needs to run before update_ui
+        self.ui.solver.addItems(self.my_app.solvers.keys())
+
         self.update_ui()
 
         # menu actions:
@@ -106,18 +109,13 @@ class DorPlan(object):
         self.ui.generateSolution.clicked.connect(self.generate_solution)
         self.ui.openReport.clicked.connect(self.open_report)
 
-        # other
+        # other connections
         self.ui.max_time.textEdited.connect(self.update_options)
         self.ui.log_level.currentIndexChanged.connect(self.update_options)
         self.ui.solver.currentIndexChanged.connect(self.update_options)
-        self.ui.solver.addItems(self.my_app.solvers.keys())
 
         # on select tabWidget:
         self.ui.tabWidget.currentChanged.connect(self.on_tab_changed)
-
-        # Set up logging to QTextBrowser
-        # text_browser_handler = QTextBrowserLogger(self.ui.solution_log)
-        # self.options["log_handler"] = text_browser_handler
 
         MainWindow.show()
         self.app.exec()
@@ -143,7 +141,12 @@ class DorPlan(object):
         return True
 
     def update_ui(self) -> bool:
+        # we update the UI with the current options:
         self.ui.max_time.setText(str(self.options.get("timeLimit", 60)))
+        if my_solver := self.options.get("solver"):
+            if (index := self.ui.solver.findText(my_solver)) != -1:
+                self.ui.solver.setCurrentIndex(index)
+
         if self.instance is None:
             self.ui.instCheck.setText("No instance loaded")
             self.ui.instCheck.setStyleSheet("QLabel { color : red; }")

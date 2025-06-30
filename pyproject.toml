@@ -24,7 +24,7 @@ reports = [
     "papermill",
     "matplotlib"
 ]
-example = ["orloge", "pulp", "highspy", "ortools", "networkx"]
+example = ["orloge", "pulp", "highspy", "ortools", "networkx", "timefold", "pydantic"]
 
 [build-system]
 requires = ["setuptools"]

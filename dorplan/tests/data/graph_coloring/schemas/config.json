@@ -11,7 +11,7 @@
         },
         "solver": {
             "type": "string",
-            "enum": ["ortools", "pulp"],
+            "enum": ["ortools", "pulp", "timefold", "networkx"],
             "default": "ortools"
         }
     }

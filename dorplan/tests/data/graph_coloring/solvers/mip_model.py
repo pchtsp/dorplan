@@ -15,9 +15,8 @@ from ..core import Solution, Experiment
 class PulpMip(Experiment):
     def solve(self, options: dict):
         model = pl.LpProblem()
-        input_data = pt.SuperDict.from_dict(self.instance.data)
         nodes = self.instance.get_nodes()
-        pairs = input_data["pairs"]
+        pairs = self.instance.get_pairs()
         max_colors = len(nodes) - 1
         all_colors = range(max_colors)
 
@@ -33,11 +32,9 @@ class PulpMip(Experiment):
         )
         # TODO: identify maximum cliques and apply constraint on the cliques instead of on pairs
         # colors should be different if part of pair
-        for pair in pairs:
+        for n1, n2 in pairs:
             for color in all_colors:
-                model += (
-                    node_color[pair["n1"], color] + node_color[pair["n2"], color] <= 1
-                )
+                model += node_color[n1, color] + node_color[n2, color] <= 1
 
         # max one color per node
         for node in nodes:
@@ -87,7 +84,7 @@ class PulpMip(Experiment):
             )
         # get the solution
         assign_list = (
-            node_color.vfilter(pl.value)
+            node_color.vfilter(lambda v: pl.value(v) > 0.5)
             .keys_tl()
             .vapply(lambda v: dict(node=v[0], color=v[1]))
         )
