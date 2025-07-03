@@ -41,7 +41,7 @@ uv run dorplan/example/example.py
 
 The example shows a graph-coloring problem, which is a simple optimization problem where the goal is to color the nodes using the least number of colors in a graph such that no two adjacent nodes have the same color.
 
-Many engines are available to solve this problem, such as [CP-SAT](https://developers.google.com/optimization/cp), and [HiGHS](https://github.com/ERGO-Code/HiGHS) [via PuLP](https://github.com/coin-or/pulp/), [networkX](https://networkx.org/), and [timefold](https://www.timefold.com/). For those that take a time limit (all but networkx), you can set it in the GUI. You can also stop the execution if the solver is configured to do it (all but networkx).
+Many engines are available to solve this problem, such as [CP-SAT](https://developers.google.com/optimization/cp), and [HiGHS](https://github.com/ERGO-Code/HiGHS) [via PuLP](https://github.com/coin-or/pulp/), [networkX](https://networkx.org/), and [timefold](https://timefold.ai/). For those that take a time limit (all but networkx), you can set it in the GUI. You can also stop the execution if the solver is configured to do it (all but networkx).
 
 ## Functionality
 

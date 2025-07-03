@@ -4,7 +4,7 @@ version = "0.8.2"
 description = "Desktop OR planner"
 requires-python = ">=3.10"
 dependencies = [
-    "cornflow-client-pchtsp", "PySide6"
+    "cornflow-client-pchtsp", "PySide6", "click"
 ]
 authors= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
 maintainers= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
