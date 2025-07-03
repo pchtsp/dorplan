@@ -26,6 +26,8 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Quarto
+      uses: quarto-dev/quarto-actions/setup@v2        
     - name: install ubuntu dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |

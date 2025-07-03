@@ -85,6 +85,9 @@ class TestCliGraphColoring(unittest.TestCase):
             ],
             obj=self.cli_app,
         )
+        if result.exit_code:
+            print(result)
+            print(result.output)
         self.assertEqual(result.exit_code, 0)
         self.assertIn("Report saved in", result.output)
         self.assertTrue(os.path.exists(report_path))

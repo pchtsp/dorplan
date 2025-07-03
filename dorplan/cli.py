@@ -108,7 +108,7 @@ def solve_instance(
     print("Solution:")
 
     if extension == ".json":
-        experiment.to_json(output_path)
+        experiment.solution.to_json(output_path)
     elif extension == ".xlsx":
         experiment.to_excel(output_path)
     print(f"Solution saved in {output_path}")
@@ -139,6 +139,7 @@ def get_report(ctx, instance, solution, excel, config, test, report_path):
     if config is None:
         report_name = "report"
     else:
+        config = dict(config)
         report_name = config.get("report", {}).get("name", "report")
     curr_path = experiment.generate_report(report_name)
     if os.path.isdir(report_path):
