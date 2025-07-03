@@ -2,6 +2,7 @@ import click
 import os
 import functools
 from cornflow_client import ExperimentCore, ApplicationCore
+import shutil
 
 
 input_file_format = click.Path(
@@ -144,7 +145,8 @@ def get_report(ctx, instance, solution, excel, config, test, report_path):
     curr_path = experiment.generate_report(report_name)
     if os.path.isdir(report_path):
         report_path = os.path.join(report_path, "report.html")
-    os.rename(curr_path, report_path)
+
+    shutil.move(curr_path, report_path)
     print(f"Report saved in {report_path}")
 
 
