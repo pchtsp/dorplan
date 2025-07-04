@@ -39,3 +39,17 @@ class Instance(InstanceCore):
         for n1, n2 in arcs:
             G.add_edge(n1, n2)
         return G
+
+    def check(self):
+        """
+        Check the instance data for validity.
+        This method can be overridden to implement custom validation logic.
+        """
+        non_integer_pair = dict()
+        for pair in self.data["pairs"]:
+            if not isinstance(pair["n1"], int):
+                non_integer_pair[pair["n1"]] = True
+            if not isinstance(pair["n2"], int):
+                non_integer_pair[pair["n2"]] = True
+        result = dict(non_integer_node=non_integer_pair)
+        return {k: v for k, v in result.items() if v}

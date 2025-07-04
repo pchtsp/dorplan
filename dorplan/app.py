@@ -254,7 +254,7 @@ class DorPlan(object):
         return True
 
     def check_instance(self) -> None:
-        if not self.instance:
+        if not self.instance or not isinstance(self.instance, self.Instance):
             self.show_message(
                 title="Missing files", text="No instance is loaded, can't verify it."
             )
