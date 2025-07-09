@@ -31,6 +31,7 @@ class DorPlan(object):
     options: dict
     excel_path: str
     force_log_redirect_win: bool
+    MainWindow: QtWidgets.QMainWindow
 
     def __init__(
         self,
@@ -41,6 +42,7 @@ class DorPlan(object):
         app_name: str | None = None,
         force_log_redirect_win: bool = False,
         datasets_dir: str | None = None,
+        start_app: bool = True,
     ):
         self.opt_worker = None
         self.rep_worker = None
@@ -54,7 +56,7 @@ class DorPlan(object):
         self.options = options
         self.app = QtWidgets.QApplication(sys.argv)
         self.force_log_redirect_win = force_log_redirect_win
-        MainWindow = QtWidgets.QMainWindow()
+        self.MainWindow = QtWidgets.QMainWindow()
 
         if datasets_dir is None:
             if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", None):
@@ -66,15 +68,15 @@ class DorPlan(object):
         if ui is None:
             ui = Ui_MainWindow
         self.ui = ui()
-        self.ui.setupUi(MainWindow)
+        self.ui.setupUi(self.MainWindow)
 
         if app_name is not None:
-            MainWindow.setWindowTitle(app_name)
+            self.MainWindow.setWindowTitle(app_name)
 
         # set icon
         icon_path = os.path.join(datasets_dir, icon_file)
         if os.path.exists(icon_path):
-            MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
+            self.MainWindow.setWindowIcon(QtGui.QIcon(icon_path))
 
         self.instance = None
         self.solution = None
@@ -117,8 +119,9 @@ class DorPlan(object):
         # on select tabWidget:
         self.ui.tabWidget.currentChanged.connect(self.on_tab_changed)
 
-        MainWindow.show()
-        self.app.exec()
+        if start_app:
+            self.MainWindow.show()
+            self.app.exec()
 
     def load_test(self, test_num: int = 0) -> None:
 
