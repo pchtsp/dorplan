@@ -49,6 +49,7 @@ class DummyUi:
         self.solution_report = DummyLog()
         self.objectiveLineEdit = MagicMock()
         self.errorsLineEdit = MagicMock()
+        self.progressBar = MagicMock()
 
     def setupUi(self, MainWindow):
         pass

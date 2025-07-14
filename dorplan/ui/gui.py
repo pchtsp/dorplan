@@ -4,7 +4,7 @@
 ################################################################################
 ## Form generated from reading UI file 'gui.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -19,9 +19,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
     QHBoxLayout, QLabel, QLayout, QLineEdit,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QStatusBar, QTabWidget,
-    QTextBrowser, QVBoxLayout, QWidget)
+    QMainWindow, QMenu, QMenuBar, QProgressBar,
+    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
+    QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -63,13 +63,13 @@ class Ui_MainWindow(object):
 "        border-radius: 4px;\n"
 "    }\n"
 "    QComboBox {\n"
-"        padding: 5px;"
-                        "\n"
+"        padding: 5px;\n"
 "        border: 1px solid #ccc;\n"
 "        border-radius: 4px;\n"
 "    }\n"
 "    QTextBrowser {\n"
-"        border: 1px solid #ccc;\n"
+""
+                        "        border: 1px solid #ccc;\n"
 "        border-radius: 4px;\n"
 "        padding: 5px;\n"
 "        background-color: white;\n"
@@ -185,7 +185,7 @@ class Ui_MainWindow(object):
         self.max_timeLabel = QLabel(self.Config)
         self.max_timeLabel.setObjectName(u"max_timeLabel")
 
-        self.formLayout_3.setWidget(1, QFormLayout.LabelRole, self.max_timeLabel)
+        self.formLayout_3.setWidget(1, QFormLayout.ItemRole.LabelRole, self.max_timeLabel)
 
         self.max_time = QLineEdit(self.Config)
         self.max_time.setObjectName(u"max_time")
@@ -195,39 +195,39 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.max_time.sizePolicy().hasHeightForWidth())
         self.max_time.setSizePolicy(sizePolicy1)
 
-        self.formLayout_3.setWidget(1, QFormLayout.FieldRole, self.max_time)
+        self.formLayout_3.setWidget(1, QFormLayout.ItemRole.FieldRole, self.max_time)
 
         self.solverLabel = QLabel(self.Config)
         self.solverLabel.setObjectName(u"solverLabel")
 
-        self.formLayout_3.setWidget(2, QFormLayout.LabelRole, self.solverLabel)
+        self.formLayout_3.setWidget(2, QFormLayout.ItemRole.LabelRole, self.solverLabel)
 
         self.solver = QComboBox(self.Config)
         self.solver.setObjectName(u"solver")
         self.solver.setEditable(True)
 
-        self.formLayout_3.setWidget(2, QFormLayout.FieldRole, self.solver)
+        self.formLayout_3.setWidget(2, QFormLayout.ItemRole.FieldRole, self.solver)
 
         self.log_levelLabel = QLabel(self.Config)
         self.log_levelLabel.setObjectName(u"log_levelLabel")
 
-        self.formLayout_3.setWidget(3, QFormLayout.LabelRole, self.log_levelLabel)
+        self.formLayout_3.setWidget(3, QFormLayout.ItemRole.LabelRole, self.log_levelLabel)
 
         self.log_level = QComboBox(self.Config)
         self.log_level.setObjectName(u"log_level")
         self.log_level.setEditable(True)
 
-        self.formLayout_3.setWidget(3, QFormLayout.FieldRole, self.log_level)
+        self.formLayout_3.setWidget(3, QFormLayout.ItemRole.FieldRole, self.log_level)
 
         self.reuse_solLabel = QLabel(self.Config)
         self.reuse_solLabel.setObjectName(u"reuse_solLabel")
 
-        self.formLayout_3.setWidget(4, QFormLayout.LabelRole, self.reuse_solLabel)
+        self.formLayout_3.setWidget(4, QFormLayout.ItemRole.LabelRole, self.reuse_solLabel)
 
         self.reuse_sol = QCheckBox(self.Config)
         self.reuse_sol.setObjectName(u"reuse_sol")
 
-        self.formLayout_3.setWidget(4, QFormLayout.FieldRole, self.reuse_sol)
+        self.formLayout_3.setWidget(4, QFormLayout.ItemRole.FieldRole, self.reuse_sol)
 
 
         self.verticalLayout_13.addLayout(self.formLayout_3)
@@ -248,6 +248,13 @@ class Ui_MainWindow(object):
         self.stopExecution.setSizePolicy(sizePolicy)
 
         self.horizontalLayout_12.addWidget(self.stopExecution)
+
+        self.progressBar = QProgressBar(self.Config)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setEnabled(False)
+        self.progressBar.setValue(0)
+
+        self.horizontalLayout_12.addWidget(self.progressBar)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -285,24 +292,24 @@ class Ui_MainWindow(object):
         self.objectiveLabel = QLabel(self.Output)
         self.objectiveLabel.setObjectName(u"objectiveLabel")
 
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.objectiveLabel)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.objectiveLabel)
 
         self.objectiveLineEdit = QLineEdit(self.Output)
         self.objectiveLineEdit.setObjectName(u"objectiveLineEdit")
         self.objectiveLineEdit.setReadOnly(True)
 
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.objectiveLineEdit)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.objectiveLineEdit)
 
         self.errorsLabel = QLabel(self.Output)
         self.errorsLabel.setObjectName(u"errorsLabel")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.errorsLabel)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.errorsLabel)
 
         self.errorsLineEdit = QLineEdit(self.Output)
         self.errorsLineEdit.setObjectName(u"errorsLineEdit")
         self.errorsLineEdit.setReadOnly(True)
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.errorsLineEdit)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.errorsLineEdit)
 
 
         self.verticalLayout_15.addLayout(self.formLayout)
@@ -413,3 +420,4 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Output), QCoreApplication.translate("MainWindow", u"Statistics", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi
+

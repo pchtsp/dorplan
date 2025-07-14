@@ -77,7 +77,7 @@ class AppTest(unittest.TestCase):
         # Patch OptimWorker to avoid threading and side effects
         with (
             patch("dorplan.app.OptimWorker", MockWorker),
-            patch("dorplan.app.LogTailer"),
+            patch("dorplan.app.ProgressMonitor"),
         ):
             mock_worker_instance = app.opt_worker
             self.dummy_ui.stopExecution.clicked.connect = MagicMock()
@@ -96,7 +96,7 @@ class AppTest(unittest.TestCase):
         # Patch RepWorker and dependencies
         with (
             patch("dorplan.app.RepWorker", MockRepWorker),
-            patch("dorplan.app.LogTailer"),
+            patch("dorplan.app.ProgressMonitor"),
         ):
             result = app.generate_report()
             self.assertTrue(result)

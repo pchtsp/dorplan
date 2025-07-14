@@ -10,7 +10,7 @@ from cornflow_client.constants import (  # type: ignore[import-untyped]
 import os
 
 from typing import Type
-from .workers import OptimWorker, RepWorker, LogTailer, OptimWorkerMulti
+from .workers import OptimWorker, RepWorker, ProgressMonitor, OptimWorkerMulti
 from .ui.gui import Ui_MainWindow
 
 import copy
@@ -21,7 +21,7 @@ class DorPlan(object):
     ui: Ui_MainWindow
     opt_worker: OptimWorker | OptimWorkerMulti | None
     rep_worker: RepWorker | None
-    my_log_tailer: LogTailer | None
+    my_log_tailer: ProgressMonitor | None
     my_app: ApplicationCore
     Instance: Type[InstanceCore]
     Solution: Type[SolutionCore]
@@ -304,6 +304,7 @@ class DorPlan(object):
         else:
             my_optim_worker = OptimWorker
             self.ui.stopExecution.setText("Stop execution")
+        # self.ui.progressBar.setEnabled(True)
         self.opt_worker = my_optim_worker(
             self.my_app_type,
             self.instance.to_dict(),
@@ -313,8 +314,12 @@ class DorPlan(object):
         )
         # self.opt_worker.setObjectName("test thread")
 
-        self.my_log_tailer = LogTailer(
-            options["logPath"], self.ui.solution_log, interval=100
+        self.my_log_tailer = ProgressMonitor(
+            options["logPath"],
+            self.ui.solution_log,
+            self.ui.progressBar,
+            time_limit=options["timeLimit"],
+            interval=100,
         )
         self.opt_worker.started.connect(self.my_log_tailer.start)
         self.opt_worker.finished.connect(self.get_solution)
@@ -421,8 +426,13 @@ class DorPlan(object):
         font.setPointSize(8)
         self.ui.solution_report.setFont(font)
 
-        self.my_log_tailer = LogTailer(
-            my_log_file, self.ui.solution_report, interval=100
+        self.my_log_tailer = ProgressMonitor(
+            my_log_file,
+            self.ui.solution_report,
+            # TODO: add a progress bar for the report generation
+            None,
+            time_limit=200,
+            interval=100,
         )
         self.rep_worker.started.connect(self.my_log_tailer.start)
         self.rep_worker.error.connect(self.update_report_log)
@@ -570,6 +580,6 @@ if __name__ == "__main__":
     # for pyside2:
     # Migration to pyside2:
     # https://www.learnpyqt.com/blog/pyqt5-vs-pyside2/
-    # pyside6-uic ihtc2024/ui/gui/gui.ui -o ihtc2024/ui/gui/gui.py
+    # pyside6-uic dorplan/ui/gui.ui -o dorplan/ui/gui.py
 
     pass
