@@ -52,6 +52,7 @@ class ProgressMonitor(QtCore.QObject):
         # we stop the timer
         self.timer.stop()
         if self.progress_bar is not None:
+            self.progress_bar.setValue(100)
             self.progress_bar.setEnabled(False)
         # we delete the log file, unless we configure not to
         if not self.keep_log_file and os.path.exists(self.file_path):

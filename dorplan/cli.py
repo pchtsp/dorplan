@@ -3,6 +3,7 @@ import os
 import functools
 from cornflow_client import ExperimentCore, ApplicationCore
 import shutil
+from typing import Type
 
 
 input_file_format = click.Path(
@@ -11,9 +12,11 @@ input_file_format = click.Path(
 
 
 class DorPlanCli(object):
-    def __init__(self, my_app: ApplicationCore, my_engine: ExperimentCore | None):
-        self.app = my_app
-        self.engine = my_engine
+    def __init__(
+        self, optim_app: Type[ApplicationCore], engine: Type[ExperimentCore] | None
+    ):
+        self.my_app = optim_app()
+        self.engine = engine
 
     def run(self):
         """Run the CLI application."""
@@ -86,7 +89,7 @@ def solve_instance(
     else:
         config = dict(config)
     if "solver" in config:
-        engine = app.app.get_solver(config["solver"])
+        engine = app.my_app.get_solver(config["solver"])
     elif app.engine is not None:
         engine = app.engine
     else:
@@ -157,9 +160,9 @@ def get_instance_solution(
     test,
     app: DorPlanCli,
 ):
-    Instance = app.app.instance
-    Solution = app.app.solution
-    test_cases = app.app.test_cases
+    Instance = app.my_app.instance
+    Solution = app.my_app.solution
+    test_cases = app.my_app.test_cases
     solution, instance = None, None
     if excel:
         if instance_path or solution_path or test:

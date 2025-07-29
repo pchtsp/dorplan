@@ -3,5 +3,5 @@ from dorplan.cli import DorPlanCli
 
 if __name__ == "__main__":
 
-    my_cli = DorPlanCli(GraphColoring(), None)
+    my_cli = DorPlanCli(GraphColoring, None)
     my_cli.run()

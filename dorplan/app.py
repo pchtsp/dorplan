@@ -50,7 +50,8 @@ class DorPlan(object):
 
         self.my_app_type = optim_app
         self.my_app = optim_app()
-        self.Experiment = self.my_app.get_solver(self.my_app.get_default_solver_name())
+        default_solver = self.my_app.get_default_solver_name()
+        self.Experiment = self.my_app.get_solver(default_solver)
         self.Instance = self.my_app.instance
         self.Solution = self.my_app.solution
         self.options = options
@@ -85,6 +86,7 @@ class DorPlan(object):
         self.ui.solver.addItems(self.my_app.solvers.keys())
 
         self.update_ui()
+        self.update_options()
 
         # menu actions:
         self.ui.actionOpen_from.triggered.connect(self.choose_file)

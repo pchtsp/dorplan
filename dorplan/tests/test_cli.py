@@ -11,12 +11,12 @@ from dorplan.tests.data.graph_coloring import GraphColoring
 
 class TestCliGraphColoring(unittest.TestCase):
     def setUp(self):
-        self.app = GraphColoring()
+        self.app = GraphColoring
         self.engine = next(iter(self.app.solvers.values()))
         self.cli_app = DorPlanCli(self.app, self.engine)
         self.runner = CliRunner()
         self.tmpdir = tempfile.mkdtemp()
-        self.test_case = self.app.test_cases[0]
+        self.test_case = self.app().test_cases[0]
         self.instance_path = os.path.join(self.tmpdir, "instance.json")
         with open(self.instance_path, "w") as f:
             json.dump(self.test_case["instance"], f)

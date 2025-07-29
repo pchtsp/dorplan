@@ -52,7 +52,6 @@ class GraphColoring(ApplicationCore):
             ]
 
     except ImportError as e:
-        print(e)
         instance = InstanceCore
         solution = SolutionCore
         solvers = dict(experiment=ExperimentCore)
