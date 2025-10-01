@@ -1,6 +1,6 @@
 [project]
 name = "dorplan"
-version = "0.11.1"
+version = "0.11.2"
 description = "Desktop OR planner"
 requires-python = ">=3.10"
 dependencies = [
@@ -36,6 +36,7 @@ packages = [
     "dorplan.example",
     "dorplan.ui",
     "dorplan.workers",
+    "dorplan.shared",
     "dorplan.tests",
     "dorplan.tests.data.graph_coloring",
     "dorplan.tests.data.graph_coloring.core",
