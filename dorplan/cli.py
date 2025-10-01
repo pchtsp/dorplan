@@ -4,7 +4,7 @@ import functools
 from cornflow_client import ExperimentCore, ApplicationCore
 import shutil
 from typing import Type
-from dorplan.workers.tools import stdout_redirected
+from .shared.tools import stdout_redirected
 import sys
 
 input_file_format = click.Path(

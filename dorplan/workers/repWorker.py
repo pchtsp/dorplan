@@ -2,7 +2,7 @@ from .base_worker import BaseWorker
 import sys
 import os
 from PySide6 import QtCore
-from .tools import stdout_redirected
+from ..shared.tools import stdout_redirected
 
 
 class RepWorker(BaseWorker):

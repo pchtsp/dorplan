@@ -3,7 +3,7 @@ from cornflow_client.constants import (
     SOLUTION_STATUS_INFEASIBLE,
 )
 from .base_worker import BaseWorker
-from .tools import stdout_redirected
+from ..shared.tools import stdout_redirected
 import os
 import sys
 
