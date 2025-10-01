@@ -4,7 +4,8 @@ import functools
 from cornflow_client import ExperimentCore, ApplicationCore
 import shutil
 from typing import Type
-
+from dorplan.workers.tools import stdout_redirected
+import sys
 
 input_file_format = click.Path(
     exists=True, dir_okay=False, file_okay=True, readable=True
@@ -103,8 +104,22 @@ def solve_instance(
     if ext != extension:
         output_path = filename + extension
 
-    experiment = engine.from_dict(dict(instance=instance, solution=solution))
-    experiment.solve(config)
+    # only redirect if logPath is provided
+    if log_name := config.get("logPath"):
+        if not os.path.exists(log_name):
+            open(log_name, "w").close()
+
+        with (
+            open(log_name, "a") as f,
+            stdout_redirected(f, sys.stdout),
+            stdout_redirected(f, sys.stderr),
+        ):
+            experiment = engine.from_dict(dict(instance=instance, solution=solution))
+            experiment.solve(config)
+    else:
+        # no redirection, print to console
+        experiment = engine.from_dict(dict(instance=instance, solution=solution))
+        experiment.solve(config)
 
     if not experiment.solution:
         return print("No solution found.")

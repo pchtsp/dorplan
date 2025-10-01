@@ -4,6 +4,8 @@ import tempfile
 import shutil
 import unittest
 from click.testing import CliRunner
+import subprocess
+import sys
 
 from dorplan.cli import cli, DorPlanCli
 from dorplan.tests.data.graph_coloring import GraphColoring
@@ -117,6 +119,55 @@ class TestCliGraphColoring(unittest.TestCase):
         self.assertTrue(
             "No instance was provided" in result.output or result.exit_code != 0
         )
+
+    def test_logging_to_file_subprocess_ortools(self):
+        log_content = self.run_example_in_process("ortools")
+        self.assertTrue(log_content.strip())  # Check log file is not empty
+        self.assertIn("Starting CP-SAT solver v9.14.6206", log_content)
+
+    def test_logging_to_file_subprocess_pulp(self):
+        log_content = self.run_example_in_process("pulp")
+        self.assertTrue(log_content.strip())  # Check log file is not empty
+        self.assertIn("Running HiGHS", log_content)
+
+    def test_logging_to_file_subprocess_timefold(self):
+        log_content = self.run_example_in_process("timefold")
+        self.assertTrue(log_content.strip())  # Check log file is not empty
+        self.assertIn("timefold.solver", log_content)
+
+    def run_example_in_process(self, my_solver: str, timeout: int = 2) -> str:
+        log_path = os.path.join(self.tmpdir, "log.txt")
+        output_path = os.path.join(self.tmpdir, "out.json")
+        example_script = os.path.join(
+            os.path.dirname(__file__), "../example/example_cli.py"
+        )
+        # Prepare CLI command as a subprocess
+        cmd = [
+            sys.executable,
+            example_script,
+            "solve-instance",
+            "--instance",
+            self.instance_path,
+            "--output-path",
+            output_path,
+            "-c",
+            "logPath",
+            log_path,
+            "-c",
+            "solver",
+            my_solver,
+            "-c",
+            "timeLimit",
+            str(timeout),
+        ]
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+        result = subprocess.run(cmd, env=env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, msg=result.stderr)
+        self.assertTrue(os.path.exists(log_path))
+        with open(log_path, "r") as f:
+            log_content = f.read()
+        return log_content
 
 
 if __name__ == "__main__":
